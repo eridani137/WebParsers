@@ -1,6 +1,8 @@
 using Drv.ChrDrvSettings;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
+using Serilog.Sinks.Spectre;
 using Spectre.Console;
 
 namespace Shared;
@@ -21,14 +23,18 @@ public static class Configuration
 
     private static void Configure()
     {
+        const string logs = "logs";
         const string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{Level:u3}] {Message:lj}{NewLine}{Exception}";
-        var logsPath = Path.Combine("logs");
-
+        var logsPath = Path.Combine(logs);
+        Directory.CreateDirectory(logsPath);
+        var levelSwitch = new LoggingLevelSwitch();
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
+            .MinimumLevel.ControlledBy(levelSwitch)
             .Enrich.FromLogContext()
-            .WriteTo.Console(outputTemplate: outputTemplate)
-            .WriteTo.File($"{logsPath}/.log", rollingInterval: RollingInterval.Day, outputTemplate: outputTemplate, restrictedToMinimumLevel: LogEventLevel.Error)
+            .Enrich.WithMachineName()
+            .Enrich.WithEnvironmentName()
+            .WriteTo.Spectre(outputTemplate: outputTemplate)
+            .WriteTo.File($"{logsPath}/.log", rollingInterval: RollingInterval.Day, outputTemplate: outputTemplate, levelSwitch: levelSwitch)
             .CreateLogger();
     }
 }

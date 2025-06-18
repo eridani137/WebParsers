@@ -89,7 +89,7 @@ internal static class Program
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e, "Ошибка в цикле обработки ссылок");
+                    Log.Error(e, "Ошибка в цикле обработки ссылок: {Url}", url);
                 }
             }
         }

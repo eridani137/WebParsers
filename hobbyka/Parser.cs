@@ -18,7 +18,7 @@ public class Parser(ChrDrv drv)
         var parse = drv.PageSource.GetParse();
         if (parse is null)
         {
-            Log.Error("parse is null");
+            Log.Error("parse is null: {Url}", url);
             return null;
         }
 
@@ -52,13 +52,13 @@ public class Parser(ChrDrv drv)
             }
             catch (Exception e)
             {
-                Log.Error(e, "Ошибка при обработке вариантов");
+                Log.Error(e, "Ошибка при обработке вариантов: {Url}", url);
             }
         }
 
         if (name is null || art == 0 || characteristics == string.Empty || variants.Count == 0)
         {
-            Log.Error("Пустые значения");
+            Log.Error("Пустые значения: {Url}", url);
             return null;
         }
 
