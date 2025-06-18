@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hobbyka", "hobbyka\hobbyka.csproj", "{3EFA5C27-481B-44EA-A468-984C85E205E3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{8659D5ED-CCAF-4AEF-8478-77E0BD30A744}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{3EFA5C27-481B-44EA-A468-984C85E205E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EFA5C27-481B-44EA-A468-984C85E205E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EFA5C27-481B-44EA-A468-984C85E205E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8659D5ED-CCAF-4AEF-8478-77E0BD30A744}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8659D5ED-CCAF-4AEF-8478-77E0BD30A744}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8659D5ED-CCAF-4AEF-8478-77E0BD30A744}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8659D5ED-CCAF-4AEF-8478-77E0BD30A744}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
