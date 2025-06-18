@@ -12,34 +12,53 @@ public class Parser(ChrDrv drv)
 {
     private const string Root = "//div[@class='element_description']";
 
-    public async Task ProcessUrl(string url)
+    public async Task<ElementEntity?> ProcessUrl(string url)
     {
-        var splitUrl = url.Replace(Program.SiteUrl, "");
-        var nodeXpath = $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
-        drv.FocusAndScrollToElement(nodeXpath);
-        drv.HighlightElementByXPath(nodeXpath);
-
         await drv.Navigate().GoToUrlAsync(url);
         var parse = drv.PageSource.GetParse();
         if (parse is null)
         {
             Log.Error("parse is null. {Url}", url);
-            return;
+            return null;
         }
 
         var name = parse.GetInnerText($"{Root}//h1");
         var artStr = parse.GetAttributeValue($"{Root}//div[@class='element_article']/meta", "content");
         var art = int.Parse(artStr ?? string.Empty);
-        var priceStr = parse.GetInnerText($"{Root}//span[@id='catalog_item_price_top']");
-        var price = decimal.Parse(priceStr ?? string.Empty);
         var characteristicsList =
             parse.GetInnerTextValues(
                 $"{Root}//div[@class='element_comp elem_specs elem_desc']");
         var characteristics = string.Join(Environment.NewLine, characteristicsList);
+        var colorsList =
+            parse.GetInnerTextValues(
+                $"{Root}//div[@class='element_comp elem_colors']/ul/li/label//span[@class='fl_span']");
+        var tagsList = parse.GetInnerTextValues($"{Root}//div[@class='element_comp elem_tags']/a");
+        var variantXpaths = parse.GetXPaths($"{Root}//div[@class='element_comp elem_size']/ul/li");
+        var variants = new List<ElementVariant>();
+        foreach (var variantXpath in variantXpaths)
+        {
+            try
+            {
+                var priceStr = parse.GetAttributeValue($"{variantXpath}/meta[@itemprop='price']", "content");
+                var price = decimal.Parse(priceStr ?? string.Empty);
+                var label = parse.GetInnerText($"{variantXpath}/label[@for]");
+                if (label is null) throw new Exception("label is null");
+                variants.Add(new ElementVariant()
+                {
+                    Label = label,
+                    Price = price
+                });
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Ошибка при обработке вариантов");
+            }
+;       }
 
-        if (name is null || art == 0 || price == 0 || characteristics == string.Empty)
+        if (name is null || art == 0 || characteristics == string.Empty || colorsList.Count == 0 || tagsList.Count == 0 || variants.Count == 0)
         {
             Log.Error("Пустые значения. {Url}", url);
+            return null;
         }
 
         AnsiConsole.MarkupLine("Начинаю загрузку картинок...".MarkupSecondary());
@@ -79,23 +98,19 @@ public class Parser(ChrDrv drv)
 
         AnsiConsole.MarkupLine("Все картинки загружены".MarkupSecondary());
 
-        // var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
-        //
-        // var entity = new ElementEntity
-        // {
-        //     Url = url,
-        //     Art = art,
-        //     Name = name!,
-        //     Price = price
-        // };
-        //
-        // await collection.ReplaceOneAsync(
-        //     filter,
-        //     entity,
-        //     new ReplaceOptions { IsUpsert = true }); // TODO
+        var entity = new ElementEntity
+        {
+            Url = url,
+            Art = art,
+            Name = name,
+            Characteristics = characteristics,
+            Colors = colorsList,
+            Tags = tagsList,
+            Variants = variants
+        };
 
         AnsiConsole.MarkupLine("Завершение обработки...".MarkupSecondary());
-        drv.SpecialWait(2000);
-        await drv.Navigate().BackAsync();
+
+        return entity;
     }
 }

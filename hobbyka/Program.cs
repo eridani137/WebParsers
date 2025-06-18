@@ -1,4 +1,5 @@
 ﻿using Drv;
+using Drv.Stealth.Clients.Extensions;
 using MongoDB.Driver;
 using Serilog;
 using Shared;
@@ -45,10 +46,26 @@ internal static class Program
         var parser = new Parser(drv);
         foreach (var url in urls)
         {
-            AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
             try
             {
-                await parser.ProcessUrl(url);
+                AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
+                
+                var splitUrl = url.Replace(SiteUrl, "");
+                var nodeXpath = $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
+                drv.FocusAndScrollToElement(nodeXpath);
+                drv.HighlightElementByXPath(nodeXpath);
+                
+                var entity = await parser.ProcessUrl(url);
+                if (entity is null) continue;
+                
+                // var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
+                // await collection.ReplaceOneAsync(
+                //     filter,
+                //     entity,
+                //     new ReplaceOptions { IsUpsert = true }); // TODO
+                
+                drv.SpecialWait(2000);
+                await drv.Navigate().BackAsync();
             }
             catch (Exception e)
             {
