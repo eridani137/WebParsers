@@ -54,9 +54,9 @@ public class Parser(ChrDrv drv)
             {
                 Log.Error(e, "Ошибка при обработке вариантов");
             }
-;       }
+        }
 
-        if (name is null || art == 0 || characteristics == string.Empty || tagsList.Count == 0 || variants.Count == 0)
+        if (name is null || art == 0 || characteristics == string.Empty || variants.Count == 0)
         {
             Log.Error("Пустые значения");
             return null;
