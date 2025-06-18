@@ -1,18 +1,25 @@
 using Drv.ChrDrvSettings;
 using Serilog;
 using Serilog.Events;
+using Spectre.Console;
 
 namespace Shared;
 
 public static class Configuration
 {
-    public static ChrDrvSettingsBase DrvSettings = new ChrDrvSettingsWithAutoDriver()
+    public static readonly ChrDrvSettingsBase DrvSettings = new ChrDrvSettingsWithAutoDriver()
     {
         ChromeDir = @"D:\Chrome",
         UsernameDir = "NewUser"
     };
-    
-    public static void Configure()
+
+    static Configuration()
+    {
+        AnsiConsole.MarkupLine("Запуск...".MarkupSecondary());
+        Configure();
+    }
+
+    private static void Configure()
     {
         const string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{Level:u3}] {Message:lj}{NewLine}{Exception}";
         var logsPath = Path.Combine("logs");
