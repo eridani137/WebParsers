@@ -78,6 +78,7 @@ internal static class Program
             }
         }
 
+        AnsiConsole.MarkupLine("Все ссылки обработаны".MarkupPrimary());
         AnsiConsole.MarkupLine("Нажмите любую клавишу для выхода...".MarkupSecondary());
         Console.ReadKey(true);
     }
