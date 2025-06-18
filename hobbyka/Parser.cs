@@ -18,7 +18,7 @@ public class Parser(ChrDrv drv)
         var parse = drv.PageSource.GetParse();
         if (parse is null)
         {
-            Log.Error("parse is null. {Url}", url);
+            Log.Error("parse is null");
             return null;
         }
 
@@ -39,7 +39,8 @@ public class Parser(ChrDrv drv)
         {
             try
             {
-                var priceStr = parse.GetAttributeValue($"{variantXpath}/meta[@itemprop='price']", "content");
+                var priceStr = parse.GetAttributeValue($"{variantXpath}/meta[@itemprop='price']", "content")
+                    ?? parse.GetAttributeValue($"{variantXpath}/input", "data-price");
                 var price = decimal.Parse(priceStr ?? string.Empty);
                 var label = parse.GetInnerText($"{variantXpath}/label[@for]");
                 if (label is null) throw new Exception("label is null");
@@ -55,9 +56,9 @@ public class Parser(ChrDrv drv)
             }
 ;       }
 
-        if (name is null || art == 0 || characteristics == string.Empty || colorsList.Count == 0 || tagsList.Count == 0 || variants.Count == 0)
+        if (name is null || art == 0 || characteristics == string.Empty || tagsList.Count == 0 || variants.Count == 0)
         {
-            Log.Error("Пустые значения. {Url}", url);
+            Log.Error("Пустые значения");
             return null;
         }
 

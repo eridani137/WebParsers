@@ -41,9 +41,13 @@ internal static class Program
 
         using var drv = await ChrDrvFactory.Create(Configuration.DrvSettings);
         await drv.Navigate().GoToUrlAsync(currentRootUrl);
+        var parser = new Parser(drv);
+
+        // var test = await parser.ProcessUrl(
+        //     "https://hobbyka.ru/product/zaryadnoe_ustroystvo_i_tochka_dostupa_wifi_valli_2x_usb_i_1x220v/");
 
         AnsiConsole.MarkupLine("Начинаю обработку...".MarkupSecondary());
-        var parser = new Parser(drv);
+
         foreach (var url in urls)
         {
             try
