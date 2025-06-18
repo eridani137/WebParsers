@@ -11,7 +11,7 @@ public static class Configuration
 {
     public static readonly ChrDrvSettingsBase DrvSettings = new ChrDrvSettingsWithAutoDriver()
     {
-        ChromeDir = @"D:\Chrome",
+        ChromeDir = "D:\\Chrome",
         UsernameDir = "NewUser"
     };
 
