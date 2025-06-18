@@ -17,4 +17,14 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="скамейки.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
