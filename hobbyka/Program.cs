@@ -42,11 +42,23 @@ internal static class Program
 
             using var drv = await ChrDrvFactory.Create(Configuration.DrvSettings);
             await drv.Navigate().GoToUrlAsync(categoryUrl);
+            
+            drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
+            drv.SpecialWait(2000);
+            drv.ExecuteScript("window.scrollTo(0, 0)");
+            drv.SpecialWait(2000);
+            drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
+            drv.SpecialWait(2000);
+            drv.ExecuteScript("window.scrollTo(0, 0)");
+            drv.SpecialWait(2000);
+            drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
+            
             var parser = new Parser(drv);
             var parse = drv.PageSource.GetParse();
             if (parse is null) throw new Exception("root parse is null");
             var urls = parse.GetAttributeValues(
-                "//div[@id='catalog_list_of_elements']//div[@class='view_element']//a[@class='product-link']");
+                "//div[@id='catalog_list_of_elements']//div[@class='view_element']//a[@class='product-link']")
+                .Select(u => $"{SiteUrl}{u}").ToList();
             AnsiConsole.MarkupLine($"Прочитано {urls.Count} строк".MarkupSecondary());
 
             AnsiConsole.MarkupLine("Начинаю обработку...".MarkupSecondary());
