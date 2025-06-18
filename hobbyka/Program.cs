@@ -1,7 +1,9 @@
 ﻿using Drv.ChrDrvSettings;
 using hobbyka;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MongoDB.Driver;
 using Serilog;
 
 try
@@ -16,6 +18,8 @@ try
         UsernameDir = "NewUser"
     });
     builder.Services.AddHostedService<Parser>();
+    builder.Services.AddSingleton<IMongoClient>(_ =>
+        new MongoClient(builder.Configuration.GetConnectionString("Mongo")));
 
     var app = builder.Build();
     

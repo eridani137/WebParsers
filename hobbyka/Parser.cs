@@ -12,93 +12,124 @@ using Spectre.Console;
 
 namespace hobbyka;
 
-public class Parser(ChrDrvSettingsWithAutoDriver drvSettings, IOptions<AppSettings> appSettings, ILogger<Parser> logger) : BackgroundService
+public class Parser(
+    IMongoClient client,
+    ChrDrvSettingsWithAutoDriver drvSettings,
+    IOptions<AppSettings> appSettings,
+    ILogger<Parser> logger)
+    : BackgroundService
 {
     private const string SiteUrl = "https://hobbyka.ru";
     private const string BaseImagesPath = "images";
     private const string RootXpath = "//div[@class='element_description']";
     private ChrDrv _drv = null!;
-    
+    private IMongoDatabase _database = null!;
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _database = client.GetDatabase("hobbyka");
         Directory.CreateDirectory(BaseImagesPath);
-        
-        foreach (var (categoryName, categoryUrl) in appSettings.Value.DownloadCategories)
+        _drv = await ChrDrvFactory.Create(drvSettings);
+
+        if (appSettings.Value.SingleUrls.Count > 0)
         {
             var grid = new Grid();
             grid.AddColumn(new GridColumn());
-            grid.AddRow(new Markup($"Текущая категория: {categoryName}".MarkupPrimary()));
-            grid.AddRow(new Markup($"Текущий URL: {categoryUrl}".MarkupPrimary()));
+            grid.AddRow(new Markup($"Режим отдельных ссылок".MarkupPrimary()));
             var panel = new Panel(grid)
                 .BorderColor(Color.Yellow)
                 .Border(SpectreConfig.BoxBorder);
             panel.Width = AnsiConsole.Profile.Width;
             AnsiConsole.Write(panel);
 
-            var client = new MongoClient("mongodb://eridani:qwerty@localhost:27017/");
-            var database = client.GetDatabase("hobbyka");
-            var collection = database.GetCollection<ElementEntity>(categoryName);
-
-            _drv = await ChrDrvFactory.Create(drvSettings);
-            await _drv.Navigate().GoToUrlAsync(categoryUrl);
-            
-            _drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
-            _drv.SpecialWait(2000);
-            _drv.ExecuteScript("window.scrollTo(0, 0)");
-            _drv.SpecialWait(2000);
-            _drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
-            _drv.SpecialWait(2000);
-            _drv.ExecuteScript("window.scrollTo(0, 0)");
-            _drv.SpecialWait(2000);
-            _drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
-            
-            var parse = _drv.PageSource.GetParse();
-            if (parse is null) throw new Exception("root parse is null");
-            var urls = parse.GetAttributeValues(
-                "//div[@id='catalog_list_of_elements']//div[@class='view_element']//a[@class='product-link']")
-                .Select(u => $"{SiteUrl}{u}").ToList();
-            AnsiConsole.MarkupLine($"Прочитано {urls.Count} строк".MarkupSecondary());
-
-            AnsiConsole.MarkupLine("Начинаю обработку...".MarkupSecondary());
-
-            foreach (var url in urls)
+            foreach (var (categoryName, urls) in appSettings.Value.SingleUrls)
             {
-                try
+                foreach (var url in urls)
                 {
-                    AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
-
-                    var splitUrl = url.Replace(SiteUrl, "");
-                    var nodeXpath =
-                        $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
-                    _drv.FocusAndScrollToElement(nodeXpath);
-                    _drv.HighlightElementByXPath(nodeXpath);
-
-                    var entity = await ProcessUrl(url);
-                    if (entity is null) continue;
-
-                    var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
-                    await collection.ReplaceOneAsync(
-                        filter,
-                        entity,
-                        new ReplaceOptions { IsUpsert = true }, stoppingToken);
-
-                    _drv.SpecialWait(2000);
-                    await _drv.Navigate().BackAsync();
+                    await ProcessEntity(url, categoryName);
                 }
-                catch (Exception e)
+            }
+        }
+        else
+        {
+            foreach (var (categoryName, categoryUrl) in appSettings.Value.DownloadCategories)
+            {
+                var grid = new Grid();
+                grid.AddColumn(new GridColumn());
+                grid.AddRow(new Markup($"Текущая категория: {categoryName}".MarkupPrimary()));
+                grid.AddRow(new Markup($"Текущий URL: {categoryUrl}".MarkupPrimary()));
+                var panel = new Panel(grid)
+                    .BorderColor(Color.Yellow)
+                    .Border(SpectreConfig.BoxBorder);
+                panel.Width = AnsiConsole.Profile.Width;
+                AnsiConsole.Write(panel);
+
+                await _drv.Navigate().GoToUrlAsync(categoryUrl);
+
+                _drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
+                _drv.SpecialWait(2000);
+                _drv.ExecuteScript("window.scrollTo(0, 0)");
+                _drv.SpecialWait(2000);
+                _drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
+                _drv.SpecialWait(2000);
+                _drv.ExecuteScript("window.scrollTo(0, 0)");
+                _drv.SpecialWait(2000);
+                _drv.ExecuteScript("window.scrollTo(0, document.body.scrollHeight)");
+
+                var parse = _drv.PageSource.GetParse();
+                if (parse is null) throw new Exception("root parse is null");
+                var urls = parse.GetAttributeValues(
+                        "//div[@id='catalog_list_of_elements']//div[@class='view_element']//a[@class='product-link']")
+                    .Select(u => $"{SiteUrl}{u}").ToList();
+                AnsiConsole.MarkupLine($"Прочитано {urls.Count} строк".MarkupSecondary());
+
+                AnsiConsole.MarkupLine("Начинаю обработку...".MarkupSecondary());
+
+                foreach (var url in urls)
                 {
-                    logger.LogError(e, "Ошибка в цикле обработки ссылок: {Url}", url);
+                    try
+                    {
+                        AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
+
+                        var splitUrl = url.Replace(SiteUrl, "");
+                        var nodeXpath =
+                            $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
+                        _drv.FocusAndScrollToElement(nodeXpath);
+                        _drv.HighlightElementByXPath(nodeXpath);
+
+                        await ProcessEntity(url, categoryName);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, "Ошибка в цикле обработки ссылок: {Url}", url);
+                    }
                 }
             }
         }
 
         _drv.Dispose();
-        
+
         AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
         AnsiConsole.MarkupLine("Нажмите любую клавишу для выхода...".MarkupPrimary());
         Console.ReadKey(true);
     }
 
+    private async Task ProcessEntity(string url, string categoryName)
+    {
+        var collection = _database.GetCollection<ElementEntity>(categoryName);
+        
+        var entity = await ProcessUrl(url);
+        if (entity is null) return;
+
+        var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
+        await collection.ReplaceOneAsync(
+            filter,
+            entity,
+            new ReplaceOptions { IsUpsert = true });
+
+        _drv.SpecialWait(2000);
+        await _drv.Navigate().BackAsync();
+    }
 
     private async Task<ElementEntity?> ProcessUrl(string url)
     {
@@ -128,7 +159,7 @@ public class Parser(ChrDrvSettingsWithAutoDriver drvSettings, IOptions<AppSettin
             try
             {
                 var priceStr = parse.GetAttributeValue($"{variantXpath}/meta[@itemprop='price']", "content")
-                    ?? parse.GetAttributeValue($"{variantXpath}/input", "data-price");
+                               ?? parse.GetAttributeValue($"{variantXpath}/input", "data-price");
                 var price = decimal.Parse(priceStr ?? string.Empty);
                 var label = parse.GetInnerText($"{variantXpath}/label[@for]");
                 if (label is null) throw new Exception("label is null");
