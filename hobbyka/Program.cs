@@ -11,11 +11,11 @@ internal static class Program
 {
     public const string BaseImagesPath = "images";
     public const string SiteUrl = "https://hobbyka.ru";
-    
+
     public static async Task Main()
     {
         Directory.CreateDirectory(BaseImagesPath);
-        
+
         var categories = new Dictionary<string, string>()
         {
             ["скамейки"] = $"{SiteUrl}/catalog/skameyki/"
@@ -49,21 +49,22 @@ internal static class Program
             try
             {
                 AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
-                
+
                 var splitUrl = url.Replace(SiteUrl, "");
-                var nodeXpath = $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
+                var nodeXpath =
+                    $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
                 drv.FocusAndScrollToElement(nodeXpath);
                 drv.HighlightElementByXPath(nodeXpath);
-                
+
                 var entity = await parser.ProcessUrl(url);
                 if (entity is null) continue;
-                
-                // var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
-                // await collection.ReplaceOneAsync(
-                //     filter,
-                //     entity,
-                //     new ReplaceOptions { IsUpsert = true }); // TODO
-                
+
+                var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
+                await collection.ReplaceOneAsync(
+                    filter,
+                    entity,
+                    new ReplaceOptions { IsUpsert = true });
+
                 drv.SpecialWait(2000);
                 await drv.Navigate().BackAsync();
             }
