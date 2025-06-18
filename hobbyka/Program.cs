@@ -1,6 +1,7 @@
 ﻿using Drv;
 using Drv.Stealth.Clients.Extensions;
 using MongoDB.Driver;
+using ParserExtension;
 using Serilog;
 using Shared;
 using Spectre.Console;
@@ -18,68 +19,71 @@ internal static class Program
 
         var categories = new Dictionary<string, string>()
         {
-            ["скамейки"] = $"{SiteUrl}/catalog/skameyki/"
+            ["Скамейки"] = $"{SiteUrl}/catalog/skameyki/",
+            ["Урны"] = $"{SiteUrl}/catalog/urny/",
+            ["Перголы"] = $"{SiteUrl}/catalog/pergoly/"
         };
-        var (currentName, currentRootUrl) = categories.ElementAt(0);
 
-        var grid = new Grid();
-        grid.AddColumn(new GridColumn());
-        grid.AddRow(new Markup($"Текущая категория: {currentName}".MarkupPrimary()));
-        grid.AddRow(new Markup($"Текущий URL: {currentRootUrl}".MarkupPrimary()));
-        var panel = new Panel(grid)
-            .BorderColor(Color.Yellow)
-            .Border(SpectreConfig.BoxBorder);
-        panel.Width = AnsiConsole.Profile.Width;
-        AnsiConsole.Write(panel);
-
-        var client = new MongoClient("mongodb://eridani:qwerty@localhost:27017/");
-        var database = client.GetDatabase("hobbyka");
-        var collection = database.GetCollection<ElementEntity>(currentName);
-
-        var urls = await File.ReadAllLinesAsync($"{currentName}.txt");
-        AnsiConsole.MarkupLine($"Прочитано {urls.Length} строк".MarkupSecondary());
-
-        using var drv = await ChrDrvFactory.Create(Configuration.DrvSettings);
-        await drv.Navigate().GoToUrlAsync(currentRootUrl);
-        var parser = new Parser(drv);
-
-        // var test = await parser.ProcessUrl(
-        //     "https://hobbyka.ru/product/divan_parkovyy_s_figurnoy_rezkoy_florentsiya/");
-
-        AnsiConsole.MarkupLine("Начинаю обработку...".MarkupSecondary());
-
-        foreach (var url in urls)
+        foreach (var (categoryName, categoryUrl) in categories)
         {
-            try
+            var grid = new Grid();
+            grid.AddColumn(new GridColumn());
+            grid.AddRow(new Markup($"Текущая категория: {categoryName}".MarkupPrimary()));
+            grid.AddRow(new Markup($"Текущий URL: {categoryUrl}".MarkupPrimary()));
+            var panel = new Panel(grid)
+                .BorderColor(Color.Yellow)
+                .Border(SpectreConfig.BoxBorder);
+            panel.Width = AnsiConsole.Profile.Width;
+            AnsiConsole.Write(panel);
+
+            var client = new MongoClient("mongodb://eridani:qwerty@localhost:27017/");
+            var database = client.GetDatabase("hobbyka");
+            var collection = database.GetCollection<ElementEntity>(categoryName);
+
+            using var drv = await ChrDrvFactory.Create(Configuration.DrvSettings);
+            await drv.Navigate().GoToUrlAsync(categoryUrl);
+            var parser = new Parser(drv);
+            var parse = drv.PageSource.GetParse();
+            if (parse is null) throw new Exception("root parse is null");
+            var urls = parse.GetAttributeValues(
+                "//div[@id='catalog_list_of_elements']//div[@class='view_element']//a[@class='product-link']");
+            AnsiConsole.MarkupLine($"Прочитано {urls.Count} строк".MarkupSecondary());
+
+            AnsiConsole.MarkupLine("Начинаю обработку...".MarkupSecondary());
+
+            foreach (var url in urls)
             {
-                AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
+                try
+                {
+                    AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
 
-                var splitUrl = url.Replace(SiteUrl, "");
-                var nodeXpath =
-                    $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
-                drv.FocusAndScrollToElement(nodeXpath);
-                drv.HighlightElementByXPath(nodeXpath);
+                    var splitUrl = url.Replace(SiteUrl, "");
+                    var nodeXpath =
+                        $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
+                    drv.FocusAndScrollToElement(nodeXpath);
+                    drv.HighlightElementByXPath(nodeXpath);
 
-                var entity = await parser.ProcessUrl(url);
-                if (entity is null) continue;
+                    var entity = await parser.ProcessUrl(url);
+                    if (entity is null) continue;
 
-                var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
-                await collection.ReplaceOneAsync(
-                    filter,
-                    entity,
-                    new ReplaceOptions { IsUpsert = true });
+                    var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
+                    await collection.ReplaceOneAsync(
+                        filter,
+                        entity,
+                        new ReplaceOptions { IsUpsert = true });
 
-                drv.SpecialWait(2000);
-                await drv.Navigate().BackAsync();
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Ошибка в цикле обработки ссылок");
+                    drv.SpecialWait(2000);
+                    await drv.Navigate().BackAsync();
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "Ошибка в цикле обработки ссылок");
+                }
             }
         }
 
-        AnsiConsole.MarkupLine("Все ссылки обработаны".MarkupPrimary());
-        AnsiConsole.MarkupLine("Нажмите любую клавишу для выхода...".MarkupSecondary());
+        AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
+        AnsiConsole.MarkupLine("Нажмите любую клавишу для выхода...".MarkupPrimary());
         Console.ReadKey(true);
     }
 }
