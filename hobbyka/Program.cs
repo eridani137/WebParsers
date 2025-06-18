@@ -1,4 +1,6 @@
 ﻿using Drv;
+using Drv.Stealth.Clients.Extensions;
+using Flurl.Http;
 using hobbyka;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -7,9 +9,13 @@ using Serilog;
 using Shared;
 using Spectre.Console;
 
+const string baseImagesPath = "images";
+Directory.CreateDirectory(baseImagesPath);
+
+const string siteUrl = "https://hobbyka.ru";
 var categories = new Dictionary<string, string>()
 {
-    ["скамейки"] = "https://hobbyka.ru/catalog/skameyki/"
+    ["скамейки"] = $"{siteUrl}/catalog/skameyki/"
 };
 var (currentName, currentRootUrl) = categories.ElementAt(0);
 
@@ -33,12 +39,19 @@ AnsiConsole.MarkupLine($"Прочитано {urls.Length} строк".MarkupSeco
 using var drv = await ChrDrvFactory.Create(Configuration.DrvSettings);
 await drv.Navigate().GoToUrlAsync(currentRootUrl);
 
-const string root = "//div[@class='element_description']";
+AnsiConsole.MarkupLine("Начинаю обработку...".MarkupSecondary());
 
+const string root = "//div[@class='element_description']";
 foreach (var url in urls)
 {
+    AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
     try
     {
+        var splitUrl = url.Replace(siteUrl, "");
+        var nodeXpath = $"//div[@id='catalog_list_of_elements']//a[@class='product-link' and @href='{splitUrl}']";
+        drv.FocusAndScrollToElement(nodeXpath);
+        drv.HighlightElementByXPath(nodeXpath);
+        
         await drv.Navigate().GoToUrlAsync(url);
         var parse = drv.PageSource.GetParse();
         if (parse is null)
@@ -57,21 +70,62 @@ foreach (var url in urls)
         {
             Log.Error("Пустые значения. {Url}", url);
         }
+        
+        AnsiConsole.MarkupLine("Начинаю загрузку картинок...".MarkupSecondary());
 
-        var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
+        var imageUrls = parse.GetAttributeValues("//div[@id='toggle_photo']/div/ul/li//img", "src")
+            .Select(u => $"{siteUrl}{u}").ToList();
+        AnsiConsole.MarkupLine($"Найдено {imageUrls.Count} картинок".MarkupSecondary());
 
-        var entity = new ElementEntity
-        {
-            Url = url,
-            Art = art,
-            Name = name!,
-            Price = price
-        };
+        var currentImagesPath = Path.Join(baseImagesPath, artStr);
+        Directory.CreateDirectory(currentImagesPath);
+        
+        var cookies = drv.GetCookiesAsString();
+        await AnsiConsole.Progress()
+            .StartAsync(async ctx=>
+            {
+                var task = ctx.AddTask("Загружаю картинки...".MarkupPrimary(), true, imageUrls.Count);
 
-        await collection.ReplaceOneAsync(
-            filter,
-            entity,
-            new ReplaceOptions { IsUpsert = true });
+                foreach (var (i, imageUrl) in imageUrls.Index())
+                {
+                    try
+                    {
+                        var ext = Path.GetExtension(imageUrl);
+                        await imageUrl
+                            .WithCookies(cookies)
+                            .DownloadFileAsync(currentImagesPath, $"{i}.{ext}");
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e, "Ошибка в цикле загрузки картинок");
+                    }
+                    finally
+                    {
+                        task.Increment(1);
+                    }
+                }
+            });
+        
+        AnsiConsole.MarkupLine("Все картинки загружены".MarkupSecondary());
+
+        // var filter = Builders<ElementEntity>.Filter.Eq(e => e.Url, url);
+        //
+        // var entity = new ElementEntity
+        // {
+        //     Url = url,
+        //     Art = art,
+        //     Name = name!,
+        //     Price = price
+        // };
+        //
+        // await collection.ReplaceOneAsync(
+        //     filter,
+        //     entity,
+        //     new ReplaceOptions { IsUpsert = true }); // TODO
+        
+        AnsiConsole.MarkupLine("Завершение обработки...".MarkupSecondary());
+        drv.SpecialWait(2000);
+        await drv.Navigate().BackAsync();
     }
     catch (Exception e)
     {
