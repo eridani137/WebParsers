@@ -20,9 +20,9 @@ public class WooCommerceExporter(IMongoClient client)
                 ID = (index + 10000).ToString(),
                 Артикул = p.Art.ToString(),
                 Имя = p.Name,
-                Описание = p.Description,
-                Категории = string.Join(", ", p.Tags),
-                Значения_атрибутов_1 = string.Join(", ", p.Colors)
+                Описание = $"<div>{p.Description}</div>",
+                Категории = p.Breadcrumb,
+                Значения_атрибутов_2 = string.Join(", ", p.Colors)
             }).ToList();
 
         await using var writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8);

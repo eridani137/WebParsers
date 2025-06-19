@@ -44,17 +44,17 @@ public class WooCommerceRecord
     public string Позиция { get; set; } = "0";
     public string Swatches_Attributes { get; set; } = "";
     public string Бренды { get; set; } = "";
-    public string Название_атрибута_1 { get; set; } = "цвет древесины";
+    public string Название_атрибута_1 { get; set; } = "Версия:";
     public string Значения_атрибутов_1 { get; set; } = "";
     public string Видимость_атрибута_1 { get; set; } = "1";
-    public string Глобальный_атрибут_1 { get; set; } = "1";
-    public string Название_атрибута_2 { get; set; } = "";
+    public string Глобальный_атрибут_1 { get; set; } = "0";
+    public string Название_атрибута_2 { get; set; } = "цвет древесины";
     public string Значения_атрибутов_2 { get; set; } = "";
-    public string Видимость_атрибута_2 { get; set; } = "0";
-    public string Глобальный_атрибут_2 { get; set; } = "0";
+    public string Видимость_атрибута_2 { get; set; } = "1";
+    public string Глобальный_атрибут_2 { get; set; } = "1";
     public string Название_атрибута_3 { get; set; } = "";
     public string Значения_атрибутов_3 { get; set; } = "";
-    public string Видимость_атрибута_3 { get; set; } = "0";
-    public string Глобальный_атрибут_3 { get; set; } = "0";
+    public string Видимость_атрибута_3 { get; set; } = "";
+    public string Глобальный_атрибут_3 { get; set; } = "";
     public string Атрибут_1_по_умолчанию { get; set; } = "";
 }
