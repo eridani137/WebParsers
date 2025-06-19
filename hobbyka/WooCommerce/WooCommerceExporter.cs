@@ -15,11 +15,12 @@ public class WooCommerceExporter(IMongoClient client)
 
         var wooCommerceRecords = products
             .Where(p => !excludeUrls.Any(e => e.EndsWith(p.Url)))
-            .Select(p => new WooCommerceRecord
+            .Select((p, index) => new WooCommerceRecord
             {
+                ID = (index + 10000).ToString(),
                 Артикул = p.Art.ToString(),
                 Имя = p.Name,
-                Описание = p.Characteristics,
+                Описание = p.Description,
                 Категории = string.Join(", ", p.Tags),
                 Значения_атрибутов_1 = string.Join(", ", p.Colors)
             }).ToList();

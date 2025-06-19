@@ -152,6 +152,10 @@ public class Parser(
             parse.GetInnerTextValues(
                 $"{RootXpath}//div[@class='element_comp elem_colors']/ul/li/label//span[@class='fl_span']");
         var tagsList = parse.GetInnerTextValues($"{RootXpath}//div[@class='element_comp elem_tags']/a");
+        var breadcrumbList =
+            parse.GetInnerTextValues(
+                $"{RootXpath}//div[@class='element_comp elem_breadcrumps']/div/a[@title!='Главная' and @title!='Каталог']") ?? [];
+        var breadcrumb = string.Join(" > ", breadcrumbList);
         var variantXpaths = parse.GetXPaths($"{RootXpath}//div[@class='element_comp elem_size']/ul/li");
         var variants = new List<ElementVariant>();
         foreach (var variantXpath in variantXpaths)
@@ -226,9 +230,10 @@ public class Parser(
             Url = url,
             Art = art,
             Name = name,
-            Characteristics = characteristics,
+            Description = characteristics,
             Colors = colorsList,
             Tags = tagsList,
+            Breadcrumb = breadcrumb,
             Variants = variants
         };
 
