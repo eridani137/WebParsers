@@ -1,6 +1,6 @@
 namespace hobbyka.WooCommerce;
 
-public class WooCommerceCsvRecord
+public class WooCommerceRecord
 {
     public string ID { get; set; } = "";
     public string Тип { get; set; } = "variable";

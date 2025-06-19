@@ -14,8 +14,8 @@ public class WooCommerceExporter(IMongoClient client)
         var products = await collection.Find(_ => true).ToListAsync();
 
         var wooCommerceRecords = products
-            .Where(p => excludeUrls.Any(e => e.EndsWith(p.Url)))
-            .Select(p => new WooCommerceCsvRecord
+            .Where(p => !excludeUrls.Any(e => e.EndsWith(p.Url)))
+            .Select(p => new WooCommerceRecord
             {
                 Артикул = p.Art.ToString(),
                 Имя = p.Name,
@@ -32,7 +32,7 @@ public class WooCommerceExporter(IMongoClient client)
                 HasHeaderRecord = true,
                 Encoding = System.Text.Encoding.UTF8
             });
-        csv.Context.RegisterClassMap<WooCommerceCsvMap>();
+        csv.Context.RegisterClassMap<WooCommerceMap>();
         await csv.WriteRecordsAsync(wooCommerceRecords);
     }
 }
