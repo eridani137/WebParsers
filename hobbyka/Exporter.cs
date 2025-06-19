@@ -35,7 +35,6 @@ public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSet
         }
         
         AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
-        AnsiConsole.MarkupLine("Нажмите любую клавишу для выхода...".MarkupPrimary());
-        Console.ReadKey(true);
+        AnsiConsole.MarkupLine("Завершение...".MarkupPrimary());
     }
 }

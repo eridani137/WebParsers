@@ -24,7 +24,7 @@ public class WooCommerceExporter(IMongoClient client)
                 Артикул = product.Art.ToString(),
                 Имя = product.Name,
                 Краткое_описание = $"<div class=\"compare_listing\">{product.ShortDescription}</>",
-                Описание = $"<div>{product.Description}</div>",
+                Описание = product.Description,
                 Категории = product.Breadcrumb,
                 Значения_атрибутов_2 = string.Join(", ", product.Colors)
             });

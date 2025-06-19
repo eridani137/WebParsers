@@ -1,4 +1,3 @@
-using System.Globalization;
 using Drv;
 using Drv.ChrDrvSettings;
 using Drv.Stealth.Clients.Extensions;
@@ -111,8 +110,7 @@ public class Parser(
         _drv.Dispose();
 
         AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
-        AnsiConsole.MarkupLine("Нажмите любую клавишу для выхода...".MarkupPrimary());
-        Console.ReadKey(true);
+        AnsiConsole.MarkupLine("Завершение...".MarkupPrimary());
     }
 
     private async Task ProcessEntity(string url, string categoryName)
@@ -161,7 +159,8 @@ public class Parser(
         }
         var descriptionList =
             parse.GetInnerTextValues(
-                $"{RootXpath}//div[@class='element_comp elem_specs elem_desc']");
+                $"{RootXpath}//div[@class='element_comp elem_specs elem_desc']")
+                .Where(s => !s.StartsWith("Производитель оставляет за собой право изменять конфигурацию"));
         var description = string.Join(Environment.NewLine, descriptionList.Select(s => $"<div>{s}</div>"));
         var colorsList =
             parse.GetInnerTextValues(
@@ -171,8 +170,7 @@ public class Parser(
         var tagsList = parse.GetInnerTextValues($"{RootXpath}//div[@class='element_comp elem_tags']/a");
         var breadcrumbList =
             parse.GetInnerTextValues(
-                $"{RootXpath}//div[@class='element_comp elem_breadcrumps']/div/a[@title!='Главная' and @title!='Каталог']") ??
-            [];
+                $"{RootXpath}//div[@class='element_comp elem_breadcrumps']/div/a[@title!='Главная' and @title!='Каталог']");
         var breadcrumb = string.Join(" > ", breadcrumbList);
         var variantXpaths = parse.GetXPaths($"{RootXpath}//div[@class='element_comp elem_size']/ul/li");
         var variants = new List<ElementVariant>();
