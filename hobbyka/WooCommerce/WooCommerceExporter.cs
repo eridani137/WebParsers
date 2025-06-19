@@ -15,7 +15,7 @@ public class WooCommerceExporter(IMongoClient client)
 
         var result = new List<WooCommerceRecord>();
         var index = 5000;
-        foreach (var product in products)
+        foreach (var product in products.Where(entity => !excludeUrls.Any(s => s.EndsWith(entity.Url))))
         {
             result.Add(new WooCommerceRecord()
             {
