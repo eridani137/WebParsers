@@ -16,6 +16,7 @@ public class Parser(
     IMongoClient client,
     ChrDrvSettingsWithAutoDriver drvSettings,
     IOptions<AppSettings> appSettings,
+    IHostApplicationLifetime lifetime,
     ILogger<Parser> logger)
     : BackgroundService
 {
@@ -111,6 +112,8 @@ public class Parser(
 
         AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
         AnsiConsole.MarkupLine("Завершение...".MarkupPrimary());
+        
+        lifetime.StopApplication();
     }
 
     private async Task ProcessEntity(string url, string categoryName)

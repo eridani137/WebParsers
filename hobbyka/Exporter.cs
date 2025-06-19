@@ -6,7 +6,7 @@ using Spectre.Console;
 
 namespace hobbyka;
 
-public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSettings) : BackgroundService
+public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSettings, IHostApplicationLifetime lifetime) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -36,5 +36,7 @@ public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSet
         
         AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
         AnsiConsole.MarkupLine("Завершение...".MarkupPrimary());
+        
+        lifetime.StopApplication();
     }
 }
