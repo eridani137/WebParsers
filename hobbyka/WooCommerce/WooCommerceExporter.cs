@@ -13,17 +13,41 @@ public class WooCommerceExporter(IMongoClient client)
         var collection = database.GetCollection<ElementEntity>(categoryName);
         var products = await collection.Find(_ => true).ToListAsync();
 
-        var wooCommerceRecords = products
-            .Where(p => !excludeUrls.Any(e => e.EndsWith(p.Url)))
-            .Select((p, index) => new WooCommerceRecord
+        var result = new List<WooCommerceRecord>();
+        var index = 5000;
+        foreach (var product in products)
+        {
+            result.Add(new WooCommerceRecord()
             {
-                ID = (index + 10000).ToString(),
-                Артикул = p.Art.ToString(),
-                Имя = p.Name,
-                Описание = $"<div>{p.Description}</div>",
-                Категории = p.Breadcrumb,
-                Значения_атрибутов_2 = string.Join(", ", p.Colors)
-            }).ToList();
+                ID = index.ToString(),
+                Тип = "variable",
+                Артикул = product.Art.ToString(),
+                Имя = product.Name,
+                Описание = $"<div>{product.Description}</div>",
+                Категории = product.Breadcrumb,
+                Значения_атрибутов_2 = string.Join(", ", product.Colors)
+            });
+            
+            foreach (var variant in product.Variants)
+            {
+                index++;
+                result.Add(new WooCommerceRecord()
+                {
+                    ID = index.ToString(),
+                    Тип = "variation",
+                    Имя = product.Name,
+                    Налоговый_класс = "parent",
+                    Базовая_цена = variant.Price.ToString(CultureInfo.InvariantCulture),
+                    Родительский = product.Art.ToString(),
+                    Значения_атрибутов_1 = variant.Label,
+                    Видимость_атрибута_1 = "",
+                    Название_атрибута_2 = "pa_цвет-древесины",
+                    Видимость_атрибута_2 = ""
+                });
+            }
+            
+            index++;
+        }
 
         await using var writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8);
         await using var csv = new CsvWriter(writer,
@@ -34,6 +58,6 @@ public class WooCommerceExporter(IMongoClient client)
                 Encoding = System.Text.Encoding.UTF8
             });
         csv.Context.RegisterClassMap<WooCommerceMap>();
-        await csv.WriteRecordsAsync(wooCommerceRecords);
+        await csv.WriteRecordsAsync(result);
     }
 }
