@@ -33,5 +33,9 @@ public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSet
 
             await exporter.ExportToCsvAsync(filePath, currentCategory, excludeUrls);
         }
+        
+        AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
+        AnsiConsole.MarkupLine("Нажмите любую клавишу для выхода...".MarkupPrimary());
+        Console.ReadKey(true);
     }
 }

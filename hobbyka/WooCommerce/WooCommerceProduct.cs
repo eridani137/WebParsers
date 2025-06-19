@@ -1,52 +1,60 @@
 namespace hobbyka.WooCommerce;
 
-public class WooCommerceProduct
+public class WooCommerceCsvRecord
 {
-    public string ID { get; set; }
-    public string Type { get; set; }
-    public string SKU { get; set; }
-    public string Name { get; set; }
-    public string Published { get; set; }
-    public string IsFeatured { get; set; }
-    public string VisibilityInCatalog { get; set; }
-    public string ShortDescription { get; set; }
-    public string Description { get; set; }
-    public string DateSalePriceStarts { get; set; }
-    public string DateSalePriceEnds { get; set; }
-    public string TaxStatus { get; set; }
-    public string TaxClass { get; set; }
-    public string InStock { get; set; }
-    public string Stock { get; set; }
-    public string LowStockAmount { get; set; }
-    public string BackordersAllowed { get; set; }
-    public string SoldIndividually { get; set; }
-    public string Weight { get; set; }
-    public string Length { get; set; }
-    public string Width { get; set; }
-    public string Height { get; set; }
-    public string AllowCustomerReviews { get; set; }
-    public string PurchaseNote { get; set; }
-    public string SalePrice { get; set; }
-    public string RegularPrice { get; set; }
-    public string Categories { get; set; }
-    public string Tags { get; set; }
-    public string ShippingClass { get; set; }
-    public string Images { get; set; }
-    public string DownloadLimit { get; set; }
-    public string DownloadExpiryDays { get; set; }
-    public string Parent { get; set; }
-    public string GroupedProducts { get; set; }
-    public string Upsells { get; set; }
-    public string CrossSells { get; set; }
-    public string ExternalUrl { get; set; }
-    public string ButtonText { get; set; }
-    public string Position { get; set; }
-    public string Attribute1Name { get; set; }
-    public string Attribute1Values { get; set; }
-    public string Attribute1Visible { get; set; }
-    public string Attribute1Global { get; set; }
-    public string Attribute2Name { get; set; }
-    public string Attribute2Values { get; set; }
-    public string Attribute2Visible { get; set; }
-    public string Attribute2Global { get; set; }
+    public string ID { get; set; } = "";
+    public string Тип { get; set; } = "variable";
+    public string Артикул { get; set; }
+    public string GTIN_UPC_EAN_ISBN { get; set; } = "";
+    public string Имя { get; set; }
+    public string Опубликован { get; set; } = "1";
+    public string Рекомендуемый { get; set; } = "0";
+    public string Видимость_в_каталоге { get; set; } = "visible";
+    public string Краткое_описание { get; set; } = "";
+    public string Описание { get; set; }
+    public string Дата_начала_действия_скидки { get; set; } = "";
+    public string Дата_окончания_действия_скидки { get; set; } = "";
+    public string Статус_налога { get; set; } = "taxable";
+    public string Налоговый_класс { get; set; } = "";
+    public string Наличие { get; set; } = "1";
+    public string Запасы { get; set; } = "";
+    public string Величина_малых_запасов { get; set; } = "";
+    public string Возможен_ли_предзаказ { get; set; } = "0";
+    public string Продано_индивидуально { get; set; } = "0";
+    public string Вес_кг { get; set; } = "";
+    public string Длина_см { get; set; } = "";
+    public string Ширина_см { get; set; } = "";
+    public string Высота_см { get; set; } = "";
+    public string Разрешить_отзывы { get; set; } = "1";
+    public string Примечание_к_покупке { get; set; } = "";
+    public string Акционная_цена { get; set; } = "";
+    public string Базовая_цена { get; set; } = "";
+    public string Категории { get; set; }
+    public string Метки { get; set; } = "";
+    public string Класс_доставки { get; set; } = "";
+    public string Изображения { get; set; } = "";
+    public string Лимит_скачивания { get; set; } = "";
+    public string Дней_срока_скачивания { get; set; } = "";
+    public string Родительский { get; set; } = "";
+    public string Сгруппированные_товары { get; set; } = "";
+    public string Апсэлы { get; set; } = "";
+    public string Кросселы { get; set; } = "";
+    public string Внешний_URL { get; set; } = "";
+    public string Текст_кнопки { get; set; } = "";
+    public string Позиция { get; set; } = "";
+    public string Swatches_Attributes { get; set; } = "";
+    public string Бренды { get; set; } = "";
+    public string Название_атрибута_1 { get; set; } = "цвет древесины";
+    public string Значения_атрибутов_1 { get; set; }
+    public string Видимость_атрибута_1 { get; set; } = "1";
+    public string Глобальный_атрибут_1 { get; set; } = "1";
+    public string Название_атрибута_2 { get; set; } = "";
+    public string Значения_атрибутов_2 { get; set; } = "";
+    public string Видимость_атрибута_2 { get; set; } = "";
+    public string Глобальный_атрибут_2 { get; set; } = "";
+    public string Название_атрибута_3 { get; set; } = "";
+    public string Значения_атрибутов_3 { get; set; } = "";
+    public string Видимость_атрибута_3 { get; set; } = "";
+    public string Глобальный_атрибут_3 { get; set; } = "";
+    public string Атрибут_1_по_умолчанию { get; set; } = "";
 }
