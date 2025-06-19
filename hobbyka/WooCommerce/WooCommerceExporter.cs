@@ -2,12 +2,13 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using MongoDB.Driver;
+using Spectre.Console;
 
 namespace hobbyka.WooCommerce;
 
 public class WooCommerceExporter(IMongoClient client)
 {
-    public async Task ExportToCsvAsync(string filePath, string categoryName)
+    public async Task ExportToCsvAsync(string filePath, string categoryName, string[] excludeUrls)
     {
         var database = client.GetDatabase("hobbyka");
         var collection = database.GetCollection<ElementEntity>(categoryName);
@@ -16,6 +17,11 @@ public class WooCommerceExporter(IMongoClient client)
 
         foreach (var product in products)
         {
+            if (excludeUrls.Contains(product.Url))
+            {
+                AnsiConsole.MarkupLine("Пропущен URL");
+                continue;
+            }
             if (product.Variants is { Count: > 1 })
             {
                 // Создаем родительский продукт для вариантов
