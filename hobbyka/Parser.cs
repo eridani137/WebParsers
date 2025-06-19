@@ -1,3 +1,4 @@
+using System.Globalization;
 using Drv;
 using Drv.ChrDrvSettings;
 using Drv.Stealth.Clients.Extensions;
@@ -117,7 +118,7 @@ public class Parser(
     private async Task ProcessEntity(string url, string categoryName)
     {
         var collection = _database.GetCollection<ElementEntity>(categoryName);
-        
+
         var entity = await ProcessUrl(url);
         if (entity is null) return;
 
@@ -150,11 +151,14 @@ public class Parser(
         var characteristics = string.Join(Environment.NewLine, characteristicsList);
         var colorsList =
             parse.GetInnerTextValues(
-                $"{RootXpath}//div[@class='element_comp elem_colors']/ul/li/label//span[@class='fl_span']");
+                    $"{RootXpath}//div[@class='element_comp elem_colors']/ul/li/label//span[@class='fl_span']")
+                .Select(color => char.ToUpper(color[0]) + color[1..])
+                .ToList();
         var tagsList = parse.GetInnerTextValues($"{RootXpath}//div[@class='element_comp elem_tags']/a");
         var breadcrumbList =
             parse.GetInnerTextValues(
-                $"{RootXpath}//div[@class='element_comp elem_breadcrumps']/div/a[@title!='Главная' and @title!='Каталог']") ?? [];
+                $"{RootXpath}//div[@class='element_comp elem_breadcrumps']/div/a[@title!='Главная' and @title!='Каталог']") ??
+            [];
         var breadcrumb = string.Join(" > ", breadcrumbList);
         var variantXpaths = parse.GetXPaths($"{RootXpath}//div[@class='element_comp elem_size']/ul/li");
         var variants = new List<ElementVariant>();
