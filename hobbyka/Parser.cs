@@ -158,6 +158,8 @@ public class Parser(
         {
             try
             {
+                var idStr = parse.GetAttributeValue($"{variantXpath}/input", "value");
+                var id = int.Parse(idStr ?? string.Empty);
                 var priceStr = parse.GetAttributeValue($"{variantXpath}/meta[@itemprop='price']", "content")
                                ?? parse.GetAttributeValue($"{variantXpath}/input", "data-price");
                 var price = decimal.Parse(priceStr ?? string.Empty);
@@ -165,6 +167,7 @@ public class Parser(
                 if (label is null) throw new Exception("label is null");
                 variants.Add(new ElementVariant()
                 {
+                    Id = id,
                     Label = label,
                     Price = price
                 });

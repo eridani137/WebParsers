@@ -13,7 +13,7 @@ public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSet
         const string exportPath = "export";
         Directory.CreateDirectory(exportPath);
 
-        var excludeUrls = await File.ReadAllLinesAsync("exclude.txt", stoppingToken);
+        var excludeUrls = (await File.ReadAllLinesAsync("exclude.txt", stoppingToken));
         
         var grid = new Grid();
         grid.AddColumn(new GridColumn());

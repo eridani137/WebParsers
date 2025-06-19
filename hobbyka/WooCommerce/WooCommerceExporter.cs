@@ -17,7 +17,7 @@ public class WooCommerceExporter(IMongoClient client)
 
         foreach (var product in products)
         {
-            if (excludeUrls.Contains(product.Url))
+            if (excludeUrls.Any(u => u.EndsWith(product.Url)))
             {
                 AnsiConsole.MarkupLine("Пропущен URL");
                 continue;
@@ -257,7 +257,7 @@ public class WooCommerceExporter(IMongoClient client)
         if (string.IsNullOrEmpty(characteristics))
             return "";
 
-        var lines = characteristics.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = characteristics.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         foreach (var line in lines)
         {
             if (line.Contains("Вес") && line.Contains("кг"))
