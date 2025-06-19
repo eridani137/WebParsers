@@ -203,7 +203,7 @@ public class Parser(
                         var ext = Path.GetExtension(imageUrl);
                         await imageUrl
                             .WithCookies(cookies)
-                            .DownloadFileAsync(currentImagesPath, $"{i}.{ext}");
+                            .DownloadFileAsync(currentImagesPath, $"{i}{ext}");
                     }
                     catch (Exception e)
                     {

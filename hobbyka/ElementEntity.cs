@@ -1,5 +1,8 @@
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace hobbyka;
 
+[BsonIgnoreExtraElements]
 public class ElementEntity
 {
     public required string Url { get; set; }
