@@ -145,10 +145,24 @@ public class Parser(
         var name = parse.GetInnerText($"{RootXpath}//h1");
         var artStr = parse.GetAttributeValue($"{RootXpath}//div[@class='element_article']/meta", "content");
         var art = int.Parse(artStr ?? string.Empty);
-        var characteristicsList =
+        var shortDescription = string.Empty;
+        var shortDescriptionNode = parse.GetNodeByXPath($"{RootXpath}//div[@class='element_comp elem_specs elem_desc']/div[@class='h3' and contains(text(), 'Технические характеристики')]/..");
+        if (shortDescriptionNode is not null)
+        {
+            var divNode =
+                parse.GetNodeByXPath(
+                    $"{RootXpath}//div[@class='element_comp elem_specs elem_desc']/div[@class='h3' and contains(text(), 'Технические характеристики')]");
+            if (divNode is not null)
+            {
+                shortDescriptionNode.RemoveChild(divNode);
+            }
+            
+            shortDescription = shortDescriptionNode.InnerText.DecodeHtmlAndTrim();
+        }
+        var descriptionList =
             parse.GetInnerTextValues(
                 $"{RootXpath}//div[@class='element_comp elem_specs elem_desc']");
-        var characteristics = string.Join(Environment.NewLine, characteristicsList);
+        var description = string.Join(Environment.NewLine, descriptionList.Select(s => $"<div>{s}</div>"));
         var colorsList =
             parse.GetInnerTextValues(
                     $"{RootXpath}//div[@class='element_comp elem_colors']/ul/li/label//span[@class='fl_span']")
@@ -186,7 +200,7 @@ public class Parser(
             }
         }
 
-        if (name is null || art == 0 || characteristics == string.Empty || variants.Count == 0)
+        if (name is null || art == 0 || variants.Count == 0)
         {
             logger.LogError("Пустые значения: {Url}", url);
             return null;
@@ -234,7 +248,8 @@ public class Parser(
             Url = url,
             Art = art,
             Name = name,
-            Description = characteristics,
+            ShortDescription = shortDescription,
+            Description = description,
             Colors = colorsList,
             Tags = tagsList,
             Breadcrumb = breadcrumb,
