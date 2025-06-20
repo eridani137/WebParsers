@@ -1,15 +1,17 @@
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Spectre.Console;
 
 namespace Shared;
 
 public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHostedService
 {
     private Task? _task;
-    protected readonly IHostApplicationLifetime Lifetime = lifetime;
+    protected abstract List<MenuItem> MenuItems { get; }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _task = Worker();
+        _task = ShowMenu();
         return Task.CompletedTask;
     }
 
@@ -25,9 +27,33 @@ public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHost
         finally
         {
             _task?.Dispose();
-            Lifetime.StopApplication();
+            lifetime.StopApplication();
         }
     }
-    
-    protected abstract Task Worker();
+
+    private async Task ShowMenu()
+    {
+        while (!lifetime.ApplicationStopping.IsCancellationRequested)
+        {
+            await MenuHeader();
+            var choice = new SelectionPrompt<MenuItem>()
+                .HighlightStyle(SpectreConfig.Style)
+                .UseConverter(i => i.Title)
+                .AddChoices(MenuItems);
+            var prompt = AnsiConsole.Prompt(choice);
+            try
+            {
+                await prompt.Task.Invoke();
+            }
+            catch (Exception e)
+            {
+                Log.ForContext<BaseConsoleMenu>().Error(e, "Ошибка при выполнении таски: {TaskTitle}", prompt.Title);
+            }
+        }
+    }
+
+    protected virtual Task MenuHeader()
+    {
+        return Task.CompletedTask;
+    }
 }
