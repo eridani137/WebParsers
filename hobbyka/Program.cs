@@ -18,22 +18,14 @@ try
         ChromeDir = @"D:\Chrome",
         UsernameDir = "NewUser"
     });
-    var config = builder.Configuration.GetSection(nameof(AppSettings)).Get<AppSettings>();
-    if (config is null) throw new Exception("config is null");
-    switch (config.RunMode)
-    {
-        case RunMode.Parser:
-            builder.Services.AddHostedService<Parser>();
-            break;
-        case RunMode.Export:
-            builder.Services.AddHostedService<Exporter>();
-            break;
-        default:
-            throw new ArgumentOutOfRangeException();
-    }
+    
     builder.Services.AddSingleton<IMongoClient>(_ =>
         new MongoClient(builder.Configuration.GetConnectionString("Mongo")));
+    
     builder.Services.AddSingleton<WooCommerceExporter>();
+    builder.Services.AddSingleton<Parser>();
+    builder.Services.AddSingleton<Exporter>();
+    builder.Services.AddHostedService<ConsoleMenu>();
 
     var app = builder.Build();
     

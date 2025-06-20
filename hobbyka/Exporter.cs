@@ -6,14 +6,14 @@ using Spectre.Console;
 
 namespace hobbyka;
 
-public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSettings, IHostApplicationLifetime lifetime) : BackgroundService
+public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSettings, IHostApplicationLifetime lifetime)
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task ExecuteAsync()
     {
         const string exportPath = "export";
         Directory.CreateDirectory(exportPath);
 
-        var excludeUrls = (await File.ReadAllLinesAsync("exclude.txt", stoppingToken));
+        var excludeUrls = (await File.ReadAllLinesAsync("exclude.txt", lifetime.ApplicationStopping));
         
         var grid = new Grid();
         grid.AddColumn(new GridColumn());

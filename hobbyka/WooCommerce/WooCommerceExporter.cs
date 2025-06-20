@@ -1,6 +1,7 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using hobbyka.Entity;
 using MongoDB.Driver;
 
 namespace hobbyka.WooCommerce;

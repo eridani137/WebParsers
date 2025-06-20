@@ -1,6 +1,6 @@
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace hobbyka;
+namespace hobbyka.Entity;
 
 [BsonIgnoreExtraElements]
 public class ElementEntity

@@ -2,6 +2,7 @@ using Drv;
 using Drv.ChrDrvSettings;
 using Drv.Stealth.Clients.Extensions;
 using Flurl.Http;
+using hobbyka.Entity;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,6 @@ public class Parser(
     IOptions<AppSettings> appSettings,
     IHostApplicationLifetime lifetime,
     ILogger<Parser> logger)
-    : BackgroundService
 {
     private const string SiteUrl = "https://hobbyka.ru";
     private const string BaseImagesPath = "images";
@@ -26,7 +26,7 @@ public class Parser(
     private ChrDrv _drv = null!;
     private IMongoDatabase _database = null!;
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task ExecuteAsync()
     {
         _database = client.GetDatabase("hobbyka");
         Directory.CreateDirectory(BaseImagesPath);

@@ -1,4 +1,4 @@
-namespace hobbyka;
+namespace hobbyka.Entity;
 
 public class ElementVariant
 {
