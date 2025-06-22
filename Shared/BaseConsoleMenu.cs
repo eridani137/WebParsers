@@ -8,6 +8,7 @@ public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHost
 {
     private Task? _task;
     protected abstract List<MenuItem> MenuItems { get; }
+    protected string MenuTitle = "";
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -37,6 +38,7 @@ public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHost
         {
             await MenuHeader();
             var choice = new SelectionPrompt<MenuItem>()
+                .Title(MenuTitle)
                 .HighlightStyle(SpectreConfig.Style)
                 .UseConverter(i => i.Title)
                 .AddChoices(MenuItems);
