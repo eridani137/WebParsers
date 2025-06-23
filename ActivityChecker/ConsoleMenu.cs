@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ActivityChecker.Parsers;
 using ActivityChecker.Services;
 using Microsoft.Extensions.Hosting;
@@ -11,7 +12,7 @@ public class ConsoleMenu(IHostApplicationLifetime lifetime, CheckerService check
 {
     protected override List<BaseMenuItem> MenuItems { get; } =
     [
-        new SubMenuItem("Открыть файл", [
+        new SubMenuItem("Открыть файл с ссылками", [
             new MenuItem("VK", async () =>
             {
                 await checkerService.CheckFile();
@@ -25,6 +26,12 @@ public class ConsoleMenu(IHostApplicationLifetime lifetime, CheckerService check
                 await checkerService.CheckFile();
             })
         ]),
+        new MenuItem("Открыть директорию с результатами", () =>
+        {
+            Directory.CreateDirectory(CheckerService.ResultDirectory);
+            Process.Start(new ProcessStartInfo(CheckerService.ResultDirectory) { UseShellExecute = true });
+            return Task.CompletedTask;
+        }),
         new MenuItem("Авторизация", checkerService.Authorization)
     ];
 }

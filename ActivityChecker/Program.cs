@@ -2,7 +2,6 @@
 using ActivityChecker.IO;
 using ActivityChecker.Services;
 using Drv.ChrDrvSettings;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -13,16 +12,15 @@ try
 {
     Configuration.ConfigureLogger();
     var builder = Host.CreateApplicationBuilder();
+
+    const string chromeDir = "Chrome";
     
-    var appSettings = builder.Configuration.GetSection(nameof(AppSettings)).Get<AppSettings>();
-    if (appSettings is null) throw new ApplicationException("Не найдена конфигурация");
-    
-    Configuration.ConfigureDriver(builder.Services, appSettings.ChromeDir);
+    Configuration.ConfigureDriver(builder.Services, chromeDir);
 
     builder.Services.AddSerilog();
     builder.Services.AddSingleton<ChrDrvSettingsWithAutoDriver>(_ => new ChrDrvSettingsWithAutoDriver
     {
-        ChromeDir = appSettings.ChromeDir,
+        ChromeDir = chromeDir,
         UsernameDir = "RealUser"
     });
 

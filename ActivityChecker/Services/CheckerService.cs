@@ -10,10 +10,11 @@ namespace ActivityChecker.Services;
 
 public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFactory parserFactory, CsvExporter exporter)
 {
+    public const string ResultDirectory = "results";
+    
     public async Task CheckFile()
     {
-        const string results = "results";
-        Directory.CreateDirectory(results);
+        Directory.CreateDirectory(ResultDirectory);
 
         var input = new PathUserInput();
         var lines = (await File.ReadAllLinesAsync(input.Path.Trim('"'))).ToImmutableList();
@@ -30,7 +31,7 @@ public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFacto
         {
             AnsiConsole.MarkupLine("Все ссылки обработаны".MarkupAqua());
 
-            var exportPath = Path.Join(results, $"{parser.GetType().Name.Replace("Parser", "")}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv");
+            var exportPath = Path.Join(ResultDirectory, $"{parser.GetType().Name.Replace("Parser", "")}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv");
             
             await exporter.Export(exportPath, result);
 
