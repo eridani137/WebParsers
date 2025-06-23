@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Shared;
+using Shared.Menu;
 
 namespace hobbyka;
 

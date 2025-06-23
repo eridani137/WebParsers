@@ -9,11 +9,13 @@ using Shared;
 
 try
 {
-    Configuration.Configure();
+    Configuration.ConfigureLogger();
     var builder = Host.CreateApplicationBuilder();
     
     var appSettings = builder.Configuration.GetSection(nameof(AppSettings)).Get<AppSettings>();
     if (appSettings is null) throw new ApplicationException("Не найдена конфигурация");
+    
+    Configuration.ConfigureDriver(builder.Services, appSettings.ChromeDir);
 
     builder.Services.AddSerilog();
     builder.Services.AddSingleton<ChrDrvSettingsWithAutoDriver>(_ => new ChrDrvSettingsWithAutoDriver

@@ -10,7 +10,7 @@ using Shared;
 
 try
 {
-    Configuration.Configure();
+    Configuration.ConfigureLogger();
     
     var builder = Host.CreateApplicationBuilder();
 

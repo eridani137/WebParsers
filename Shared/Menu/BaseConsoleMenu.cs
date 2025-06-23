@@ -2,7 +2,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Spectre.Console;
 
-namespace Shared;
+namespace Shared.Menu;
 
 public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHostedService
 {
