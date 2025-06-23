@@ -20,7 +20,7 @@ public class VkParser(VkApi vkApi, ILogger<VkParser> logger) : ISiteParser
         await AnsiConsole.Progress()
             .StartAsync(async ctx =>
             {
-                var task = ctx.AddTask("Получение постов...", true, maxValue: lines.Count);
+                var task = ctx.AddTask("Получение постов...", maxValue: lines.Count);
                 
                 foreach (var batch in batches)
                 {

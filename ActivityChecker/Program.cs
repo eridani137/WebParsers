@@ -5,7 +5,6 @@ using Drv.ChrDrvSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MongoDB.Driver;
 using Serilog;
 using Shared;
 using VkNet.Model;
@@ -26,9 +25,6 @@ try
         ChromeDir = appSettings.ChromeDir,
         UsernameDir = "RealUser"
     });
-    
-    builder.Services.AddSingleton<IMongoClient>(_ =>
-        new MongoClient(builder.Configuration.GetConnectionString("Mongo")));
 
     var vkApi = new VkNet.VkApi(builder.Services);
     await vkApi.AuthorizeAsync(new ApiAuthParams()

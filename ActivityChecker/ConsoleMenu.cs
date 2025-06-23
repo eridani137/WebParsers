@@ -14,17 +14,15 @@ public class ConsoleMenu(IHostApplicationLifetime lifetime, CheckerService check
         new SubMenuItem("Открыть файл", [
             new MenuItem("VK", async () =>
             {
-                await checkerService.CheckFile(typeof(VkParser));
+                await checkerService.CheckFile();
             }),
-            new MenuItem("Youtube", () =>
+            new MenuItem("Youtube", async () =>
             {
-                AnsiConsole.MarkupLine("Не реализовано".MarkupRed());
-                return Task.CompletedTask;
+                await checkerService.CheckFile();
             }),
-            new MenuItem("Instagram", () =>
+            new MenuItem("Instagram", async () =>
             {
-                AnsiConsole.MarkupLine("Не реализовано".MarkupRed());
-                return Task.CompletedTask;
+                await checkerService.CheckFile();
             })
         ]),
         new MenuItem("Авторизация", checkerService.Authorization)

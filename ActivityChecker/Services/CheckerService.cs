@@ -10,7 +10,7 @@ namespace ActivityChecker.Services;
 
 public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFactory parserFactory, CsvExporter exporter)
 {
-    public async Task CheckFile(Type type)
+    public async Task CheckFile()
     {
         const string results = "results";
         Directory.CreateDirectory(results);
@@ -29,10 +29,18 @@ public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFacto
         if (result.Count > 0)
         {
             AnsiConsole.MarkupLine("Все ссылки обработаны".MarkupAqua());
+
+            var exportPath = Path.Join(results, $"{parser.GetType().Name.Replace("Parser", "")}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv");
             
-            await exporter.Export(Path.Join(results, $"VK_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv"), result);
+            await exporter.Export(exportPath, result);
 
             AnsiConsole.MarkupLine("Операция завершена".MarkupAqua());
+            AnsiConsole.Write(new TextPath(exportPath.EscapeMarkup())
+                .RootColor(Color.Yellow)
+                .SeparatorColor(Color.SeaGreen1)
+                .StemColor(Color.Yellow)
+                .LeafColor(Color.Green));
+            AnsiConsole.WriteLine();
         }
         else
         {
