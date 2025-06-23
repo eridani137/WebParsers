@@ -24,7 +24,7 @@ public class BaseUserInput
             var method = typeof(BaseUserInput).GetMethod(nameof(EnterParameter), 
                 BindingFlags.NonPublic | BindingFlags.Static);
             var genericMethod = method?.MakeGenericMethod(prop.PropertyType);
-            var value = genericMethod?.Invoke(null, [attr.Description, IsNullable(prop), attr.IsSecret]);
+            var value = genericMethod?.Invoke(null, [attr.Description, !IsNullable(prop), attr.IsSecret]);
             
             prop.SetValue(this, value);
         }
