@@ -29,7 +29,7 @@ public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFacto
 
                 AnsiConsole.MarkupLine("Все ссылки обработаны".MarkupAqua());
                 
-                await exporter.Export(Path.Join(results, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv"), result);
+                await exporter.Export(Path.Join(results, $"VK_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv"), result);
             }
             else throw new ApplicationException("parser not found");
         }
