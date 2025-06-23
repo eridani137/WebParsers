@@ -1,4 +1,5 @@
 ﻿using ActivityChecker;
+using ActivityChecker.IO;
 using ActivityChecker.Services;
 using Drv.ChrDrvSettings;
 using Microsoft.Extensions.Configuration;
@@ -38,6 +39,7 @@ try
     
     builder.Services.AddParsers();
     builder.Services.AddSingleton<CheckerService>();
+    builder.Services.AddSingleton<CsvExporter>();
     builder.Services.AddHostedService<ConsoleMenu>();
 
     var app = builder.Build();
@@ -46,11 +48,6 @@ try
     {
         Drv.Extensions.KillAllOpenedBrowsers();
     };
-
-    // if (app.Services.GetRequiredService<Api>() is { } vkApi)
-    // {
-    //     
-    // }
     
     await app.RunAsync();
 }

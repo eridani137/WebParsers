@@ -14,7 +14,7 @@ public class VkParser(VkApi vkApi, ILogger<VkParser> logger) : ISiteParser
     {
         var result = new List<ViewResult>();
         
-        var batches = lines.SplitIntoBatches(1);
+        var batches = lines.SplitIntoBatches(100);
 
         foreach (var batch in batches)
         {
@@ -23,7 +23,7 @@ public class VkParser(VkApi vkApi, ILogger<VkParser> logger) : ISiteParser
             {
                 try
                 {
-                    var views = post.Views.Count;
+                    var views = post.Views?.Count ?? 0;
                     var endWith = $"{post.OwnerId}_{post.Id}";
                     
                     result.Add(new ViewResult()
@@ -37,6 +37,8 @@ public class VkParser(VkApi vkApi, ILogger<VkParser> logger) : ISiteParser
                     logger.LogError(e, "Ошибка в цикле обработки батчей");
                 }
             }
+
+            await Task.Delay(TimeSpan.FromSeconds(5));
         }
 
         return result;
