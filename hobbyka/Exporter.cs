@@ -17,9 +17,9 @@ public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSet
         
         var grid = new Grid();
         grid.AddColumn(new GridColumn());
-        grid.AddRow(new Markup("Режим экспорта".MarkupPrimary()));
-        grid.AddRow(new Markup($"{string.Join(", ", appSettings.Value.Export)}".MarkupPrimary()));
-        grid.AddRow(new Markup($"Исключено ссылок: {excludeUrls.Length}".MarkupPrimary()));
+        grid.AddRow(new Markup("Режим экспорта".MarkupAqua()));
+        grid.AddRow(new Markup($"{string.Join(", ", appSettings.Value.Export)}".MarkupAqua()));
+        grid.AddRow(new Markup($"Исключено ссылок: {excludeUrls.Length}".MarkupAqua()));
         var panel = new Panel(grid)
             .BorderColor(Color.Yellow)
             .Border(SpectreConfig.BoxBorder);
@@ -34,8 +34,8 @@ public class Exporter(WooCommerceExporter exporter, IOptions<AppSettings> appSet
             await exporter.ExportToCsvAsync(filePath, currentCategory, excludeUrls);
         }
         
-        AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
-        AnsiConsole.MarkupLine("Завершение...".MarkupPrimary());
+        AnsiConsole.MarkupLine("Все категории обработаны".MarkupAqua());
+        AnsiConsole.MarkupLine("Завершение...".MarkupAqua());
         
         lifetime.StopApplication();
     }

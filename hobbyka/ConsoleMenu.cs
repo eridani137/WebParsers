@@ -7,9 +7,9 @@ namespace hobbyka;
 public class ConsoleMenu(IHostApplicationLifetime lifetime, Parser parser, Exporter exporter)
     : BaseConsoleMenu(lifetime)
 {
-    protected override List<MenuItem> MenuItems { get; } =
+    protected override List<BaseMenuItem> MenuItems { get; } =
     [
-        new("Парсинг", parser.ExecuteAsync),
-        new("Экспорт", exporter.ExecuteAsync)
+        new MenuItem("Парсинг", parser.ExecuteAsync),
+        new MenuItem("Экспорт", exporter.ExecuteAsync)
     ];
 }

@@ -15,7 +15,7 @@ public static class Configuration
 {
     public static void ConfigureLogger()
     {
-        AnsiConsole.MarkupLine("Настраиваю логгер...".MarkupSecondary());
+        AnsiConsole.MarkupLine("Настраиваю логгер...".MarkupYellow());
         
         const string logs = "logs";
         const string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] [{Level:u3}] {Message:lj}{NewLine}{Exception}";
@@ -37,7 +37,7 @@ public static class Configuration
 
     public static void ConfigureDriver(IServiceCollection services, string chromePath = "Chrome")
     {
-        AnsiConsole.MarkupLine("Настраиваю драйвер...".MarkupSecondary());
+        AnsiConsole.MarkupLine("Настраиваю драйвер...".MarkupYellow());
         
         var chromeDirectory = Path.Combine(Directory.GetCurrentDirectory(), chromePath);
 

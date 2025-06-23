@@ -1,4 +1,5 @@
-﻿using ActivityChecker;
+﻿using System.Text.Json;
+using ActivityChecker;
 using Drv.ChrDrvSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +7,9 @@ using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using Serilog;
 using Shared;
+using VkApi;
+using VkApi.Core.Requests;
+using VkApi.Core.Types;
 
 try
 {
@@ -27,6 +31,8 @@ try
     builder.Services.AddSingleton<IMongoClient>(_ =>
         new MongoClient(builder.Configuration.GetConnectionString("Mongo")));
 
+    builder.Services.AddSingleton<Api>(_ => new Api("091f3a59091f3a59091f3a59a80a2bf8470091f091f3a596147cf3f7b83617957730c3e"));
+    
     builder.Services.AddParsers();
     builder.Services.AddSingleton<CheckerService>();
     builder.Services.AddHostedService<ConsoleMenu>();
@@ -37,6 +43,11 @@ try
     {
         Drv.Extensions.KillAllOpenedBrowsers();
     };
+
+    if (app.Services.GetRequiredService<Api>() is { } vkApi)
+    {
+        
+    }
     
     await app.RunAsync();
 }

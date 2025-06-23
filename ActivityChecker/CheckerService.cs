@@ -1,21 +1,43 @@
 using ActivityChecker.Parsers;
 using Drv;
 using Drv.ChrDrvSettings;
+using Shared;
+using Spectre.Console;
 
 namespace ActivityChecker;
 
 public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFactory parserFactory)
 {
-    public async Task CheckFile()
+    public async Task CheckFile(Type type)
     {
         var input = new PathUserInput();
-        var strings = await File.ReadAllLinesAsync(input.Path.Trim('"'));
+        var lines = await File.ReadAllLinesAsync(input.Path.Trim('"'));
         
-        var drv = await ChrDrvFactory.Create(drvSettings);
+        AnsiConsole.MarkupLine($"Прочитано {lines.Length} строк".Highlight(SpectreConfig.Fuchsia, SpectreConfig.Aquamarine));
 
-        foreach (var line in strings)
+        if (type == typeof(VkParser))
         {
-            var parser = parserFactory.GetParser(line);
+            foreach (var line in lines)
+            {
+                // var parser = parserFactory.GetParser(line);
+                //
+                // await drv.Navigate().GoToUrlAsync(line);
+            }
         }
+        
+        // using var drv = await ChrDrvFactory.Create(drvSettings);
+        //
+        
+        
+        AnsiConsole.MarkupLine("Все ссылки обработаны".MarkupAqua());
+    }
+
+    public async Task Authorization()
+    {
+        AnsiConsole.MarkupLine("Пройдите авторизацию и нажмите любую клавишу...".MarkupAqua());
+        
+        using var drv = await ChrDrvFactory.Create(drvSettings);
+
+        Console.ReadKey(true);
     }
 }

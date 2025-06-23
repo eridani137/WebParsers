@@ -36,7 +36,7 @@ public class Parser(
         {
             var grid = new Grid();
             grid.AddColumn(new GridColumn());
-            grid.AddRow(new Markup($"Режим отдельных ссылок".MarkupPrimary()));
+            grid.AddRow(new Markup($"Режим отдельных ссылок".MarkupAqua()));
             var panel = new Panel(grid)
                 .BorderColor(Color.Yellow)
                 .Border(SpectreConfig.BoxBorder);
@@ -57,8 +57,8 @@ public class Parser(
             {
                 var grid = new Grid();
                 grid.AddColumn(new GridColumn());
-                grid.AddRow(new Markup($"Текущая категория: {categoryName}".MarkupPrimary()));
-                grid.AddRow(new Markup($"Текущий URL: {categoryUrl}".MarkupPrimary()));
+                grid.AddRow(new Markup($"Текущая категория: {categoryName}".MarkupAqua()));
+                grid.AddRow(new Markup($"Текущий URL: {categoryUrl}".MarkupAqua()));
                 var panel = new Panel(grid)
                     .BorderColor(Color.Yellow)
                     .Border(SpectreConfig.BoxBorder);
@@ -82,15 +82,15 @@ public class Parser(
                 var urls = parse.GetAttributeValues(
                         "//div[@id='catalog_list_of_elements']//div[@class='view_element']//a[@class='product-link']")
                     .Select(u => $"{SiteUrl}{u}").ToList();
-                AnsiConsole.MarkupLine($"Прочитано {urls.Count} строк".MarkupSecondary());
+                AnsiConsole.MarkupLine($"Прочитано {urls.Count} строк".MarkupYellow());
 
-                AnsiConsole.MarkupLine("Начинаю обработку...".MarkupSecondary());
+                AnsiConsole.MarkupLine("Начинаю обработку...".MarkupYellow());
 
                 foreach (var url in urls)
                 {
                     try
                     {
-                        AnsiConsole.MarkupLine($"Обработка: {url}".MarkupSecondary());
+                        AnsiConsole.MarkupLine($"Обработка: {url}".MarkupYellow());
 
                         var splitUrl = url.Replace(SiteUrl, "");
                         var nodeXpath =
@@ -110,8 +110,8 @@ public class Parser(
 
         _drv.Dispose();
 
-        AnsiConsole.MarkupLine("Все категории обработаны".MarkupPrimary());
-        AnsiConsole.MarkupLine("Завершение...".MarkupPrimary());
+        AnsiConsole.MarkupLine("Все категории обработаны".MarkupAqua());
+        AnsiConsole.MarkupLine("Завершение...".MarkupAqua());
         
         lifetime.StopApplication();
     }
@@ -207,11 +207,11 @@ public class Parser(
             return null;
         }
 
-        AnsiConsole.MarkupLine("Начинаю загрузку картинок...".MarkupSecondary());
+        AnsiConsole.MarkupLine("Начинаю загрузку картинок...".MarkupYellow());
 
         var imageUrls = parse.GetAttributeValues("//div[@id='toggle_photo']/div/ul/li//img", "src")
             .Select(u => $"{SiteUrl}{u}").ToList();
-        AnsiConsole.MarkupLine($"Найдено {imageUrls.Count} картинок".MarkupSecondary());
+        AnsiConsole.MarkupLine($"Найдено {imageUrls.Count} картинок".MarkupYellow());
 
         var currentImagesPath = Path.Join(BaseImagesPath, artStr);
         Directory.CreateDirectory(currentImagesPath);
@@ -220,7 +220,7 @@ public class Parser(
         await AnsiConsole.Progress()
             .StartAsync(async ctx =>
             {
-                var task = ctx.AddTask("Загружаю картинки...".MarkupPrimary(), true, imageUrls.Count);
+                var task = ctx.AddTask("Загружаю картинки...".MarkupAqua(), true, imageUrls.Count);
 
                 foreach (var (i, imageUrl) in imageUrls.Index())
                 {
@@ -242,7 +242,7 @@ public class Parser(
                 }
             });
 
-        AnsiConsole.MarkupLine("Все картинки загружены".MarkupSecondary());
+        AnsiConsole.MarkupLine("Все картинки загружены".MarkupYellow());
 
         var entity = new ElementEntity
         {
@@ -257,7 +257,7 @@ public class Parser(
             Variants = variants
         };
 
-        AnsiConsole.MarkupLine("Завершение обработки...".MarkupSecondary());
+        AnsiConsole.MarkupLine("Завершение обработки...".MarkupYellow());
 
         return entity;
     }

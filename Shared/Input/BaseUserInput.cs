@@ -38,9 +38,9 @@ public class BaseUserInput
 
     protected static T EnterParameter<T>(string description, bool allowNull = false, bool secret = false)
     {
-        var prompt = new TextPrompt<T>(description.MarkupSecondary())
+        var prompt = new TextPrompt<T>(description.MarkupYellow())
             .PromptStyle(SpectreConfig.Style)
-            .ValidationErrorMessage("Неверное значение".MarkupError());
+            .ValidationErrorMessage("Неверное значение".MarkupRed());
         
         if (allowNull)prompt.AllowEmpty();
         if (secret) prompt.Secret();

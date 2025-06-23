@@ -8,7 +8,7 @@ public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHost
 {
     private Task? _task;
 
-    protected abstract List<MenuItem> MenuItems { get; }
+    protected abstract List<BaseMenuItem> MenuItems { get; }
 
     protected string MenuTitle = "";
 
@@ -45,20 +45,46 @@ public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHost
         while (!lifetime.ApplicationStopping.IsCancellationRequested)
         {
             await MenuHeader();
-            var choice = new SelectionPrompt<MenuItem>()
+            var choice = new SelectionPrompt<BaseMenuItem>()
                 .Title(MenuTitle)
                 .HighlightStyle(SpectreConfig.Style)
                 .UseConverter(i => i.Title)
                 .AddChoices(MenuItems);
-            var prompt = AnsiConsole.Prompt(choice);
+            var prompt = await AnsiConsole.PromptAsync(choice);
             try
             {
-                await prompt.Task.Invoke();
+                switch (prompt)
+                {
+                    case MenuItem menuItem:
+                        await menuItem.Task.Invoke();
+                        break;
+                    case SubMenuItem subMenuItem:
+                        await ShowSubMenu(subMenuItem);
+                        break;
+                }
             }
             catch (Exception e)
             {
                 Log.ForContext<BaseConsoleMenu>().Error(e, "Ошибка при выполнении таски: {TaskTitle}", prompt.Title);
             }
+        }
+    }
+
+    private static async Task ShowSubMenu(SubMenuItem subMenu)
+    {
+        var choice = new SelectionPrompt<MenuItem>()
+            .Title(subMenu.Title)
+            .HighlightStyle(SpectreConfig.Style)
+            .UseConverter(i => i.Title)
+            .AddChoices(subMenu.SubMenuItems);
+        var prompt = await AnsiConsole.PromptAsync(choice);
+        try
+        {
+            await prompt.Task.Invoke();
+        }
+        catch (Exception e)
+        {
+            Log.ForContext<BaseConsoleMenu>().Error(e, "Ошибка при выполнении таски: {TaskTitle}", subMenu.Title);
         }
     }
 
