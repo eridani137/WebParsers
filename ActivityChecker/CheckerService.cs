@@ -18,17 +18,9 @@ public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFacto
 
         if (type == typeof(VkParser))
         {
-            var batches = lines.SplitIntoBatches(100);
-
-            foreach (var batch in batches)
-            {
-                
-            }
+            var parser = parserFactory.GetParser<VkParser>();
+            parser.GetViewCount(lines);
         }
-        
-        // using var drv = await ChrDrvFactory.Create(drvSettings);
-        //
-        
         
         AnsiConsole.MarkupLine("Все ссылки обработаны".MarkupAqua());
     }
