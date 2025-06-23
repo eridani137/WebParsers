@@ -3,6 +3,7 @@ using Drv;
 using Drv.ChrDrvSettings;
 using Shared;
 using Spectre.Console;
+using Extensions = Shared.Extensions;
 
 namespace ActivityChecker;
 
@@ -17,11 +18,11 @@ public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFacto
 
         if (type == typeof(VkParser))
         {
-            foreach (var line in lines)
+            var batches = lines.SplitIntoBatches(100);
+
+            foreach (var batch in batches)
             {
-                // var parser = parserFactory.GetParser(line);
-                //
-                // await drv.Navigate().GoToUrlAsync(line);
+                
             }
         }
         
