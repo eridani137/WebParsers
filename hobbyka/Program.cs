@@ -6,9 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using Serilog;
+using Shared;
 
 try
 {
+    Configuration.Configure();
+    
     var builder = Host.CreateApplicationBuilder();
 
     builder.Services.Configure<AppSettings>(builder.Configuration.GetSection(nameof(AppSettings)));

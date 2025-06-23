@@ -7,7 +7,9 @@ namespace Shared;
 public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHostedService
 {
     private Task? _task;
+
     protected abstract List<MenuItem> MenuItems { get; }
+
     protected string MenuTitle = "";
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -34,6 +36,12 @@ public abstract class BaseConsoleMenu(IHostApplicationLifetime lifetime) : IHost
 
     private async Task ShowMenu()
     {
+        MenuItems.Add(new MenuItem("Выход", () =>
+        {
+            lifetime.StopApplication();
+            return Task.CompletedTask;
+        }));
+        
         while (!lifetime.ApplicationStopping.IsCancellationRequested)
         {
             await MenuHeader();
