@@ -25,8 +25,8 @@ try
     builder.Services.AddSingleton<IMongoClient>(_ =>
         new MongoClient(builder.Configuration.GetConnectionString("Mongo")));
 
+    builder.Services.AddParsers();
     builder.Services.AddSingleton<CheckerService>();
-
     builder.Services.AddHostedService<ConsoleMenu>();
 
     var app = builder.Build();
