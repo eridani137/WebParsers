@@ -1,21 +1,44 @@
+using System.Collections.Immutable;
+using ActivityChecker.IO;
+using Microsoft.Extensions.Logging;
 using Shared;
+using VkNet;
 
 namespace ActivityChecker.Parsers;
 
-public class VkParser : ISiteParser
+public class VkParser(VkApi vkApi, ILogger<VkParser> logger) : ISiteParser
 {
     public string Url => "https://vk.com";
 
-    public int GetViewCount(string[] lines)
+    public async Task<List<ViewResult>> GetViewCount(ImmutableList<string> lines)
     {
-        var batches = lines.SplitIntoBatches(100);
+        var result = new List<ViewResult>();
+        
+        var batches = lines.SplitIntoBatches(1);
 
         foreach (var batch in batches)
         {
-            var postsQuery = string.Join(",", batch);
-                
+            var wallObject = await vkApi.Wall.GetByIdAsync(batch.Select(u => u.Replace($"{Url}/wall", "")), true);
+            foreach (var post in wallObject.WallPosts)
+            {
+                try
+                {
+                    var views = post.Views.Count;
+                    var endWith = $"{post.OwnerId}_{post.Id}";
+                    
+                    result.Add(new ViewResult()
+                    {
+                        Url = batch.First(s => s.EndsWith(endWith)),
+                        Views = views
+                    });
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Ошибка в цикле обработки батчей");
+                }
+            }
         }
 
-        return 0;
+        return result;
     }
 }

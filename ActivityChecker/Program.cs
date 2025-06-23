@@ -1,5 +1,5 @@
-﻿using System.Text.Json;
-using ActivityChecker;
+﻿using ActivityChecker;
+using ActivityChecker.Services;
 using Drv.ChrDrvSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,9 +7,7 @@ using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using Serilog;
 using Shared;
-using VkApi;
-using VkApi.Core.Requests;
-using VkApi.Core.Types;
+using VkNet.Model;
 
 try
 {
@@ -31,7 +29,12 @@ try
     builder.Services.AddSingleton<IMongoClient>(_ =>
         new MongoClient(builder.Configuration.GetConnectionString("Mongo")));
 
-    builder.Services.AddSingleton<Api>(_ => new Api("091f3a59091f3a59091f3a59a80a2bf8470091f091f3a596147cf3f7b83617957730c3e"));
+    var vkApi = new VkNet.VkApi(builder.Services);
+    await vkApi.AuthorizeAsync(new ApiAuthParams()
+    {
+        AccessToken = "091f3a59091f3a59091f3a59a80a2bf8470091f091f3a596147cf3f7b83617957730c3e"
+    });
+    builder.Services.AddSingleton(vkApi);
     
     builder.Services.AddParsers();
     builder.Services.AddSingleton<CheckerService>();
@@ -44,10 +47,10 @@ try
         Drv.Extensions.KillAllOpenedBrowsers();
     };
 
-    if (app.Services.GetRequiredService<Api>() is { } vkApi)
-    {
-        
-    }
+    // if (app.Services.GetRequiredService<Api>() is { } vkApi)
+    // {
+    //     
+    // }
     
     await app.RunAsync();
 }

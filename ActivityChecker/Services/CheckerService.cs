@@ -1,25 +1,26 @@
+using System.Collections.Immutable;
+using ActivityChecker.IO;
 using ActivityChecker.Parsers;
 using Drv;
 using Drv.ChrDrvSettings;
 using Shared;
 using Spectre.Console;
-using Extensions = Shared.Extensions;
 
-namespace ActivityChecker;
+namespace ActivityChecker.Services;
 
 public class CheckerService(ChrDrvSettingsWithoutDriver drvSettings, ParserFactory parserFactory)
 {
     public async Task CheckFile(Type type)
     {
         var input = new PathUserInput();
-        var lines = await File.ReadAllLinesAsync(input.Path.Trim('"'));
+        var lines = (await File.ReadAllLinesAsync(input.Path.Trim('"'))).ToImmutableList();
         
-        AnsiConsole.MarkupLine($"Прочитано {lines.Length} строк".Highlight(SpectreConfig.Fuchsia, SpectreConfig.Aquamarine));
+        AnsiConsole.MarkupLine($"Прочитано {lines.Count} строк".Highlight(SpectreConfig.Fuchsia, SpectreConfig.Aquamarine));
 
         if (type == typeof(VkParser))
         {
-            var parser = parserFactory.GetParser<VkParser>();
-            parser.GetViewCount(lines);
+            var parser = parserFactory.GetParser(lines.First());
+            await parser.GetViewCount(lines);
         }
         
         AnsiConsole.MarkupLine("Все ссылки обработаны".MarkupAqua());

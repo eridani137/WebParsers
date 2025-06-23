@@ -9,9 +9,4 @@ public class ParserFactory(IServiceProvider provider)
         return provider.GetServices<ISiteParser>()
             .FirstOrDefault(p => url.StartsWith(p.Url));
     }
-
-    public T GetParser<T>()  where T : ISiteParser
-    {
-        return (T)GetParser(typeof(T).Name)!;
-    }
 }

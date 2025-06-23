@@ -2,17 +2,22 @@ namespace Shared;
 
 public static class Extensions
 {
-    public static List<T[]> SplitIntoBatches<T>(this T[] array, int batchSize)
+    public static List<List<T>> SplitIntoBatches<T>(this ICollection<T> collection, int batchSize)
     {
         if (batchSize <= 0) throw new ArgumentException("Размер части должен быть больше нуля.", nameof(batchSize));
 
-        var result = new List<T[]>();
+        var result = new List<List<T>>();
+        var list = collection as IList<T> ?? collection.ToList();
+        var count = list.Count;
 
-        for (var i = 0; i < array.Length; i += batchSize)
+        for (var i = 0; i < count; i += batchSize)
         {
-            var currentBatchSize = Math.Min(batchSize, array.Length - i);
-            var batch = new T[currentBatchSize];
-            Array.Copy(array, i, batch, 0, currentBatchSize);
+            var currentBatchSize = Math.Min(batchSize, count - i);
+            var batch = new List<T>(currentBatchSize);
+            for (var j = 0; j < currentBatchSize; j++)
+            {
+                batch.Add(list[i + j]);
+            }
             result.Add(batch);
         }
 

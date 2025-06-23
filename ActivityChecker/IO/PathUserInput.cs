@@ -1,6 +1,6 @@
 using Shared.Input;
 
-namespace ActivityChecker;
+namespace ActivityChecker.IO;
 
 public class PathUserInput(bool request = true) : BaseUserInput(request)
 {

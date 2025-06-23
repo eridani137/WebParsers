@@ -1,4 +1,5 @@
 using ActivityChecker.Parsers;
+using ActivityChecker.Services;
 using Microsoft.Extensions.Hosting;
 using Shared;
 using Shared.Menu;
