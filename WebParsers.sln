@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActivityChecker", "ActivityChecker\ActivityChecker.csproj", "{7D34D94E-F55C-4CA6-BC87-2416E5801155}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "escortnews", "escortnews\escortnews.csproj", "{DBC29F28-2D8F-41AA-9CEA-710929608A63}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{7D34D94E-F55C-4CA6-BC87-2416E5801155}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D34D94E-F55C-4CA6-BC87-2416E5801155}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D34D94E-F55C-4CA6-BC87-2416E5801155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBC29F28-2D8F-41AA-9CEA-710929608A63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBC29F28-2D8F-41AA-9CEA-710929608A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBC29F28-2D8F-41AA-9CEA-710929608A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBC29F28-2D8F-41AA-9CEA-710929608A63}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
