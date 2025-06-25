@@ -3,11 +3,10 @@ using Shared.Menu;
 
 namespace escortnews;
 
-public class ConsoleMenu(IHostApplicationLifetime lifetime, Parser parser) : BaseConsoleMenu(lifetime)
+public class ConsoleMenu(IHostApplicationLifetime lifetime, Exporter exporter) : BaseConsoleMenu(lifetime)
 {
     protected override List<BaseMenuItem> MenuItems { get; } =
     [
-        new MenuItem("Parse", parser.Parse),
-        new MenuItem("Export", parser.Export)
+        new MenuItem("Export", exporter.Export)
     ];
 }

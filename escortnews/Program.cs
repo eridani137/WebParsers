@@ -20,13 +20,13 @@ try
     builder.Services.AddSingleton<ChrDrvSettingsWithAutoDriver>(_ => new ChrDrvSettingsWithAutoDriver
     {
         ChromeDir = chromeDir,
-        UsernameDir = "RealUser"
+        UsernameDir = "escortnews"
     });
     
     builder.Services.AddSingleton<IMongoClient>(_ =>
         new MongoClient(builder.Configuration.GetConnectionString("Mongo")));
 
-    builder.Services.AddSingleton<Parser>();
+    builder.Services.AddSingleton<Exporter>();
     builder.Services.AddHostedService<ConsoleMenu>();
     
     var app = builder.Build();

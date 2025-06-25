@@ -7,33 +7,23 @@ using Spectre.Console;
 
 namespace escortnews;
 
-public class Parser
+public class Exporter
 {
     private const string SiteUrl = "https://www.escortnews.com";
     private readonly ChrDrvSettingsWithAutoDriver _drvSettings;
     public IMongoCollection<Country> Countries { get; }
     
-    public Parser(IMongoClient client, ChrDrvSettingsWithAutoDriver drvSettings)
+    public Exporter(IMongoClient client, ChrDrvSettingsWithAutoDriver drvSettings)
     {
         _drvSettings = drvSettings;
         var db = client.GetDatabase("escortnews");
         Countries = db.GetCollection<Country>("countries");
     }
 
-    public async Task Parse()
-    {
-        var drv = await ChrDrvFactory.Create(_drvSettings);
-        
-        AnsiConsole.MarkupLine("Получение локаций".MarkupAqua());
-        var currentLocation = await GetCurrentLocation(drv);
-        
-        if (currentLocation is null) AnsiConsole.MarkupLine("Если нет ошибок, все загружено".MarkupFuchsia());
-        
-    }
-
     private async Task<Country?> GetCurrentLocation(ChrDrv drv)
     {
-        await drv.Navigate().GoToUrlAsync(SiteUrl);
+        // await drv.Navigate().GoToUrlAsync(SiteUrl);
+        await drv.Navigate().GoToUrlAsync("https://www.scrapingcourse.com/cloudflare-challenge");
         
         var parse = drv.PageSource.GetParse();
         if (parse is null) throw new ApplicationException("parse is null");
