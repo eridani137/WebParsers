@@ -13,7 +13,7 @@ try
     Configuration.ConfigureLogger();
     var builder = Host.CreateApplicationBuilder();
 
-    const string chromeDir = "Chrome";
+    var chromeDir = Path.Join(AppContext.BaseDirectory, "Chrome");
     
     Configuration.ConfigureDriver(builder.Services);
 
