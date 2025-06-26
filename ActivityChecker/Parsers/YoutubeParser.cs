@@ -5,6 +5,7 @@ using ActivityChecker.IO;
 using Drv;
 using Drv.ChrDrvSettings;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using ParserExtension;
 using Spectre.Console;
 
@@ -39,24 +40,17 @@ public class YoutubeParser(ChrDrvSettingsWithAutoDriver drvSettings, ILogger<VkP
                         var trim = script.Remove(0, 20);
                         trim = trim.Remove(trim.Length - 1, 1);
 
-                        using var document = JsonDocument.Parse(trim);
-                        var viewCountElement = document.RootElement
-                            .GetProperty("contents")
-                            .GetProperty("twoColumnWatchNextResults")
-                            .GetProperty("results")
-                            .GetProperty("results")
-                            .GetProperty("contents")[0]
-                            .GetProperty("videoPrimaryInfoRenderer")
-                            .GetProperty("viewCount")
-                            .GetProperty("videoViewCountRenderer")
-                            .GetProperty("viewCount")
-                            .GetProperty("simpleText")
-                            .GetString();
+                        var jObj = JObject.Parse(trim);
+                        var viewCountElement = 
+                            jObj.SelectToken("..videoPrimaryInfoRenderer.viewCount.videoViewCountRenderer.viewCount.simpleText") ?? 
+                            jObj.SelectToken("..videoDescriptionHeaderRenderer.views.simpleText");
 
                         if (viewCountElement is null)
-                            throw new ApplicationException("Не удалось получить количество просмотров");
+                            throw new ApplicationException($"Не удалось получить количество просмотров: {line}");
+                        
+                        var viewCountStr = viewCountElement.ToString();
 
-                        var split = viewCountElement.Split([' '], StringSplitOptions.TrimEntries)
+                        var split = viewCountStr.Split([' '], StringSplitOptions.TrimEntries)
                             .Select(s => s.Replace(" ", ""));
 
                         var str = split
