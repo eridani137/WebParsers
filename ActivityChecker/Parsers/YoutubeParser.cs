@@ -12,7 +12,7 @@ namespace ActivityChecker.Parsers;
 
 public class YoutubeParser(ChrDrvSettingsWithAutoDriver drvSettings, ILogger<VkParser> logger) : ISiteParser
 {
-    public string Url => "https://www.youtube.com";
+    public string Url => "https://youtube.com";
 
     public async Task<List<ViewResult>> GetViewCount(ImmutableList<string> lines)
     {
