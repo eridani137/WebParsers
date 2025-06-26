@@ -1,3 +1,6 @@
+using System.Globalization;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Drv;
 using Drv.ChrDrvSettings;
 using MongoDB.Driver;
@@ -9,47 +12,52 @@ namespace escortnews;
 
 public class Exporter
 {
-    private const string SiteUrl = "https://www.escortnews.com";
-    private readonly ChrDrvSettingsWithAutoDriver _drvSettings;
-    public IMongoCollection<Country> Countries { get; }
+    public IMongoCollection<ModelEntity> Models { get; }
     
-    public Exporter(IMongoClient client, ChrDrvSettingsWithAutoDriver drvSettings)
+    public Exporter(IMongoClient client)
     {
-        _drvSettings = drvSettings;
         var db = client.GetDatabase("escortnews");
-        Countries = db.GetCollection<Country>("countries");
-    }
-
-    private async Task<Country?> GetCurrentLocation(ChrDrv drv)
-    {
-        // await drv.Navigate().GoToUrlAsync(SiteUrl);
-        await drv.Navigate().GoToUrlAsync("https://www.scrapingcourse.com/cloudflare-challenge");
-        
-        var parse = drv.PageSource.GetParse();
-        if (parse is null) throw new ApplicationException("parse is null");
-        
-        var countriesXpaths = parse.GetXPaths("//ul[@class='cityList']/li/span/a");
-        foreach (var countryXpath in countriesXpaths)
-        {
-            var name = parse.GetInnerText(countryXpath);
-            var url = parse.GetAttributeValue(countryXpath);
-            
-            if (name is null || url is null) throw new ApplicationException("url is null");
-
-            if (Countries.Find(c => c.Name == name) is null)
-            {
-                return new Country()
-                {
-                    Name = name,
-                    Url = url
-                };
-            }
-        }
-
-        return null;
+        Models = db.GetCollection<ModelEntity>("models");
     }
 
     public async Task Export()
     {
+        var models = await Models.Find(_ => true).ToListAsync() ?? [];
+        
+        var fileName = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
+        var filePath = Path.Join(fileName);
+        
+        await using var writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8);
+        await using var csv = new CsvWriter(writer,
+            new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = " | ",
+                HasHeaderRecord = true,
+                Encoding = System.Text.Encoding.UTF8
+            });
+        
+        csv.Context.RegisterClassMap<ExportMap>();
+        await csv.WriteRecordsAsync(models);
     }
+}
+
+public sealed class ExportMap : ClassMap<ModelEntity>
+{
+    public ExportMap()
+    {
+        Map(x => x.url).Name("url");
+        Map(x => x.country).Name("country");
+        Map(x => x.city).Name("city");
+        Map(x => x.phone).Name("phone");
+        Map(x => x.telegram).Name("telegram");
+    }
+}
+
+public class ModelEntity
+{
+    public string url { get; set; }
+    public string country { get; set; }
+    public string city { get; set; }
+    public string? phone { get; set; }
+    public string? telegram { get; set; }
 }
