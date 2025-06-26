@@ -3,6 +3,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Drv;
 using Drv.ChrDrvSettings;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using ParserExtension;
 using Shared;
@@ -23,6 +24,12 @@ public class Exporter
     public async Task Export()
     {
         var models = await Models.Find(_ => true).ToListAsync() ?? [];
+
+        foreach (var model in models)
+        {
+            model.phone ??= "-";
+            model.telegram ??= "-";
+        }
         
         var fileName = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
         var filePath = Path.Join(fileName);
@@ -55,6 +62,8 @@ public sealed class ExportMap : ClassMap<ModelEntity>
 
 public class ModelEntity
 {
+    public ObjectId _id { get; set; }
+    public int modelId { get; set; }
     public string url { get; set; }
     public string country { get; set; }
     public string city { get; set; }
