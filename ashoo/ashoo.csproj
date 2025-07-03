@@ -5,6 +5,8 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PublishAot>true</PublishAot>
+        <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,25 +16,12 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
       <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
-      <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     </ItemGroup>
 
     <ItemGroup>
       <None Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="exclude.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Drv">
-        <HintPath>..\..\ChrDrv\Drv\bin\Debug\net9.0\Drv.dll</HintPath>
-      </Reference>
-      <Reference Include="ParserExtension">
-        <HintPath>..\..\ParserExtension\ParserExtension\bin\Debug\net9.0\ParserExtension.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>

@@ -1,34 +1,31 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Drv;
-using Drv.ChrDrvSettings;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using ParserExtension;
-using Shared;
-using Spectre.Console;
 
-namespace escortnews;
+namespace ashoo;
 
 public class Exporter
 {
-    public IMongoCollection<ModelEntity> Models { get; }
+    private IMongoCollection<ModelEntity> Models { get; }
     
     public Exporter(IMongoClient client)
     {
-        var db = client.GetDatabase("escortnews");
+        var db = client.GetDatabase("ashoo");
         Models = db.GetCollection<ModelEntity>("models");
     }
-
+    
     public async Task Export()
     {
-        var models = await Models.Find(_ => true).ToListAsync() ?? [];
+        var models = await Models.Find(f => f.phone != null).ToListAsync() ?? [];
 
         foreach (var model in models)
         {
             model.phone ??= "-";
+            model.phone = model.phone.Replace("tel:", "");
             model.telegram ??= "-";
+            model.country ??= "Россия";
         }
         
         var fileName = $"export_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
@@ -63,10 +60,9 @@ public sealed class ExportMap : ClassMap<ModelEntity>
 public class ModelEntity
 {
     public ObjectId _id { get; set; }
-    public int modelId { get; set; }
     public string url { get; set; }
-    public string country { get; set; }
-    public string city { get; set; }
+    public string? country { get; set; }
+    public string? city { get; set; }
     public string? phone { get; set; }
     public string? telegram { get; set; }
 }

@@ -15,7 +15,6 @@
       <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
       <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
-      <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     </ItemGroup>
 

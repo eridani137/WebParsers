@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActivityChecker", "Activity
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "escortnews", "escortnews\escortnews.csproj", "{DBC29F28-2D8F-41AA-9CEA-710929608A63}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ashoo", "ashoo\ashoo.csproj", "{4B642C34-5786-4C37-BDDC-85984096E052}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{DBC29F28-2D8F-41AA-9CEA-710929608A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBC29F28-2D8F-41AA-9CEA-710929608A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBC29F28-2D8F-41AA-9CEA-710929608A63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B642C34-5786-4C37-BDDC-85984096E052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B642C34-5786-4C37-BDDC-85984096E052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B642C34-5786-4C37-BDDC-85984096E052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B642C34-5786-4C37-BDDC-85984096E052}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

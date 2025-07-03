@@ -117,7 +117,7 @@ public class InstagramParser(ChrDrvSettingsWithAutoDriver drvSettings, ILogger<I
 
             var viewCountStr = parse.GetInnerText($"{videoXpath}/div[2]/div[2]//span[@dir='auto' and @style='----base-line-clamp-line-height: 20px; --lineHeight: 20px;']/span");
             if (string.IsNullOrEmpty(viewCountStr)) continue;
-            if (!int.TryParse(viewCountStr, out var viewCount)) continue;
+            if (!int.TryParse(viewCountStr.Replace(" ", "").Trim(), out var viewCount)) continue;
 
             return new ViewResult
             {
